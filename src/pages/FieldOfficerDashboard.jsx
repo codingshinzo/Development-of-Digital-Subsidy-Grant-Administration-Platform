@@ -50,9 +50,9 @@ function UtilizationReportRow({ report }) {
       <td><a href="#" className="text-primary">View</a></td>
       <td><span className="badge badge-warning">{report.status}</span></td>
       <td>
-        <button className="btn btn-primary btn-sm" style={{marginRight: '0.5rem'}}>View</button>
-        <button className="btn btn-success btn-sm" style={{marginRight: '0.5rem'}}>Approve</button>
-        <button className="btn btn-danger btn-sm" style={{marginRight: '0.5rem'}}>Reject</button>
+        <button className="btn btn-primary btn-sm" style={{ marginRight: '0.5rem' }}>View</button>
+        <button className="btn btn-success btn-sm" style={{ marginRight: '0.5rem' }}>Approve</button>
+        <button className="btn btn-danger btn-sm" style={{ marginRight: '0.5rem' }}>Reject</button>
         <button className="btn btn-secondary btn-sm">Req. Proof</button>
       </td>
     </tr>
@@ -66,14 +66,14 @@ function UtilizationReportRow({ report }) {
 const FieldOfficerDashboard = () => {
   return (
     <div className="dashboard animate-fade-in">
-      
+
       <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Field Officer Dashboard</h2>
           <p>Review and verify applicant documents.</p>
         </div>
-        <button 
-          className="btn btn-secondary" 
+        <button
+          className="btn btn-danger"
           onClick={() => { localStorage.removeItem('isAuthenticated'); window.location.href = '/'; }}
         >
           Log Out
@@ -89,7 +89,7 @@ const FieldOfficerDashboard = () => {
       </div>
 
       <div className="dashboard-content-grid" style={{ gridTemplateColumns: '1fr' }}>
-        
+
         {/* Pending Verifications Table */}
         <div className="card recent-applications">
           <h3>Pending Verifications</h3>
@@ -105,21 +105,21 @@ const FieldOfficerDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              <VerificationRow 
-                id="APP-2024-045" 
-                applicantName="Ramesh Kumar" 
-                schemeName="Solar Panel Subsidy" 
+              <VerificationRow
+                id="APP-2024-045"
+                applicantName="Ramesh Kumar"
+                schemeName="Solar Panel Subsidy"
                 score={85}
-                statusText="Verification Pending" 
-                badgeClass="badge-warning" 
+                statusText="Verification Pending"
+                badgeClass="badge-warning"
               />
-              <VerificationRow 
-                id="APP-2024-051" 
-                applicantName="Sunita Devi" 
-                schemeName="Education Grant" 
+              <VerificationRow
+                id="APP-2024-051"
+                applicantName="Sunita Devi"
+                schemeName="Education Grant"
                 score={45}
-                statusText="Verification Pending" 
-                badgeClass="badge-warning" 
+                statusText="Verification Pending"
+                badgeClass="badge-warning"
               />
             </tbody>
           </table>
@@ -148,7 +148,7 @@ const FieldOfficerDashboard = () => {
             </tbody>
           </table>
         </div>
-        
+
       </div>
     </div>
   );
