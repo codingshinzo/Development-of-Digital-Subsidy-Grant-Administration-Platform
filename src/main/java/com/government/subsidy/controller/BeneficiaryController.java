@@ -1,11 +1,10 @@
 package com.government.subsidy.controller;
 
 import com.government.subsidy.model.BeneficiaryProfile;
-import com.government.subsidy.model.User;
-import com.government.subsidy.repository.BeneficiaryProfileRepository;
-import com.government.subsidy.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.government.subsidy.service.BeneficiaryService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,31 +12,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/beneficiaries")
 public class BeneficiaryController {
 
-    @Autowired
-    private BeneficiaryProfileRepository profileRepository;
+    private final BeneficiaryService beneficiaryService;
 
-    @Autowired
-    private UserRepository userRepository;
+    public BeneficiaryController(BeneficiaryService beneficiaryService) {
+        this.beneficiaryService = beneficiaryService;
+    }
 
     @PostMapping("/{userId}")
     @PreAuthorize("hasRole('CITIZEN')")
-    public ResponseEntity<?> createProfile(@PathVariable Long userId, @RequestBody BeneficiaryProfile profile) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return ResponseEntity.badRequest().body("User not found");
-        }
-        profile.setUser(user);
-        return ResponseEntity.ok(profileRepository.save(profile));
+    public ResponseEntity<?> createProfile(@PathVariable @NonNull Long userId, @Valid @RequestBody BeneficiaryProfile profile) {
+        return ResponseEntity.ok(beneficiaryService.createProfile(userId, profile));
     }
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('CITIZEN') or hasRole('ADMIN')")
-    public ResponseEntity<BeneficiaryProfile> getProfile(@PathVariable Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) return ResponseEntity.notFound().build();
-        
-        return profileRepository.findByUser(user)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<BeneficiaryProfile> getProfile(@PathVariable @NonNull Long userId) {
+        return ResponseEntity.ok(beneficiaryService.getProfile(userId));
     }
 }
