@@ -47,6 +47,19 @@ const BeneficiaryDashboard = () => {
   return (
     <div className="dashboard animate-fade-in">
 
+      <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <h2>Beneficiary Dashboard</h2>
+          <p>Track your applications and notifications.</p>
+        </div>
+        <button
+          className="btn btn-danger"
+          onClick={() => { localStorage.removeItem('isAuthenticated'); window.location.href = '/'; }}
+        >
+          Log Out
+        </button>
+      </div>
+
       {/* Statistics Section */}
       <div className="stats-grid">
         <StatCard icon={<FaFileAlt />} title="Total Applications" value="3" type="primary" />

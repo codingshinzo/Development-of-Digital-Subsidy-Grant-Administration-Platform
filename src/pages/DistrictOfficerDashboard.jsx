@@ -27,7 +27,7 @@ function ApprovalRow({ id, applicantName, schemeName, fieldOfficer }) {
       <td>{schemeName}</td>
       <td>{fieldOfficer}</td>
       <td>
-        <button className="btn btn-primary btn-sm" style={{marginRight: '0.5rem'}}>Review</button>
+        <button className="btn btn-primary btn-sm" style={{ marginRight: '0.5rem' }}>Review</button>
         <button className="btn btn-secondary btn-sm">Forward to Finance</button>
       </td>
     </tr>
@@ -58,14 +58,14 @@ function UtilizationReportRow({ report }) {
 const DistrictOfficerDashboard = () => {
   return (
     <div className="dashboard animate-fade-in">
-      
+
       <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>District Officer Dashboard</h2>
           <p>Review and approve verified applications.</p>
         </div>
-        <button 
-          className="btn btn-secondary" 
+        <button
+          className="btn btn-danger"
           onClick={() => { localStorage.removeItem('isAuthenticated'); window.location.href = '/'; }}
         >
           Log Out
@@ -81,7 +81,7 @@ const DistrictOfficerDashboard = () => {
       </div>
 
       <div className="dashboard-content-grid" style={{ gridTemplateColumns: '1fr' }}>
-        
+
         {/* Approvals Table */}
         <div className="card recent-applications">
           <h3>Applications Awaiting Approval</h3>
@@ -96,11 +96,11 @@ const DistrictOfficerDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              <ApprovalRow 
-                id="APP-2024-032" 
-                applicantName="Priya Sharma" 
-                schemeName="Women Entrepreneurship" 
-                fieldOfficer="Amit Patel" 
+              <ApprovalRow
+                id="APP-2024-032"
+                applicantName="Priya Sharma"
+                schemeName="Women Entrepreneurship"
+                fieldOfficer="Amit Patel"
               />
             </tbody>
           </table>
@@ -129,7 +129,7 @@ const DistrictOfficerDashboard = () => {
             </tbody>
           </table>
         </div>
-        
+
       </div>
     </div>
   );

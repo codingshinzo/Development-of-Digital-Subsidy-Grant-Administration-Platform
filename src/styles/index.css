@@ -88,6 +88,17 @@ button {
   background-color: rgba(15, 76, 129, 0.05);
 }
 
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #a93226;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(192, 57, 43, 0.3);
+}
+
 .btn-block {
   width: 100%;
 }

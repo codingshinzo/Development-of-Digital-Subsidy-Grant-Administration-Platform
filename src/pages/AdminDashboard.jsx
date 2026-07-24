@@ -50,10 +50,18 @@ function UtilizationReportRow({ report }) {
 const AdminDashboard = () => {
   return (
     <div className="dashboard animate-fade-in">
-      
-      <div className="dashboard-header">
-        <h2>Admin Dashboard</h2>
-        <p>System overview and management.</p>
+
+      <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2>Admin Dashboard</h2>
+          <p>System overview and management.</p>
+        </div>
+        <button
+          className="btn btn-danger"
+          onClick={() => { localStorage.removeItem('isAuthenticated'); window.location.href = '/'; }}
+        >
+          Log Out
+        </button>
       </div>
 
       {/* Statistics Section */}
@@ -73,7 +81,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="dashboard-content-grid">
-        
+
         {/* System Activities Table */}
         <div className="card recent-applications">
           <h3>System Activities</h3>
@@ -92,7 +100,7 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
-        
+
         {/* Utilization Reports Table */}
         <div className="card recent-applications" style={{ marginTop: '2rem' }}>
           <h3>All Utilization Reports</h3>
@@ -115,7 +123,7 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
-        
+
       </div>
     </div>
   );

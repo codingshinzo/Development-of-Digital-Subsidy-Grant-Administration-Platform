@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  FaHome, FaFileAlt, FaUserEdit, FaCheckCircle, 
-  FaMoneyBillWave, FaUsers, FaChartBar, FaSignOutAlt 
+import {
+  FaHome, FaFileAlt, FaUserEdit, FaCheckCircle,
+  FaMoneyBillWave, FaUsers, FaChartBar, FaSignOutAlt
 } from 'react-icons/fa';
 import '../styles/Sidebar.css';
 
@@ -19,8 +19,8 @@ function SidebarLink({ path, icon, name, isExact }) {
 
   return (
     <li>
-      <NavLink 
-        to={path} 
+      <NavLink
+        to={path}
         end={isExact}
         onClick={handleLogoutClick}
         className={({ isActive }) => (isActive ? 'sidebar-link active' : 'sidebar-link')}
@@ -81,7 +81,6 @@ const Sidebar = () => {
     navLinks = [
       { name: 'Dashboard', path: '/dashboard', icon: <FaHome /> },
       { name: 'Schemes', path: '/schemes', icon: <FaFileAlt /> },
-      { name: 'Apply Scheme', path: '/apply', icon: <FaFileAlt /> },
       { name: 'Track Status', path: '/track-status', icon: <FaChartBar /> },
       { name: 'Utilization Report', path: '/utilization-report', icon: <FaFileAlt /> },
       { name: 'Profile', path: '/profile', icon: <FaUserEdit /> },
@@ -91,7 +90,7 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar">
-      
+
       {/* Profile Section inside Sidebar */}
       <div className="sidebar-profile">
         <div className="avatar">
@@ -102,16 +101,16 @@ const Sidebar = () => {
           <p>{currentRole}</p>
         </div>
       </div>
-      
+
       {/* Navigation Links */}
       <nav className="sidebar-nav">
         <ul>
           {navLinks.map((link, index) => {
             // Determine if the link should exactly match the path (to prevent active state bugs)
             const isExactMatch = link.path === '/dashboard' || link.path.endsWith('-officer') || link.path.endsWith('admin') || link.path === '/';
-            
+
             return (
-              <SidebarLink 
+              <SidebarLink
                 key={index}
                 path={link.path}
                 icon={link.icon}
@@ -122,7 +121,7 @@ const Sidebar = () => {
           })}
         </ul>
       </nav>
-      
+
     </aside>
   );
 };

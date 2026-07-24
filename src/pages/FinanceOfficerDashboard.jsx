@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaMoneyBillWave, FaFileInvoiceDollar, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import '../styles/Dashboard.css';
-import { utilizationReports } from '../data/utilizationReports';
+
 
 // ---------------------------------------------------------
 // Helper Components (Keeps the main component clean)
@@ -27,25 +27,8 @@ function PaymentRow({ id, applicantName, bankDetails, amount }) {
       <td>{bankDetails}</td>
       <td>{amount}</td>
       <td>
-        <button className="btn btn-primary btn-sm" style={{marginRight: '0.5rem'}}>Disburse</button>
+        <button className="btn btn-primary btn-sm" style={{ marginRight: '0.5rem' }}>Disburse</button>
         <button className="btn btn-secondary btn-sm">Reject</button>
-      </td>
-    </tr>
-  );
-}
-
-function UtilizationReportRow({ report }) {
-  return (
-    <tr>
-      <td>{report.applicationId}</td>
-      <td>{report.beneficiaryName}</td>
-      <td>{report.schemeName}</td>
-      <td>₹{report.amountReceived}</td>
-      <td>{report.purpose}</td>
-      <td><a href="#" className="text-primary">View</a></td>
-      <td><span className="badge badge-primary">{report.status}</span></td>
-      <td>
-        <button className="btn btn-primary btn-sm">View Report</button>
       </td>
     </tr>
   );
@@ -58,14 +41,14 @@ function UtilizationReportRow({ report }) {
 const FinanceOfficerDashboard = () => {
   return (
     <div className="dashboard animate-fade-in">
-      
+
       <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Finance Officer Dashboard</h2>
           <p>Manage payments and disburse funds.</p>
         </div>
-        <button 
-          className="btn btn-secondary" 
+        <button
+          className="btn btn-danger"
           onClick={() => { localStorage.removeItem('isAuthenticated'); window.location.href = '/'; }}
         >
           Log Out
@@ -81,7 +64,7 @@ const FinanceOfficerDashboard = () => {
       </div>
 
       <div className="dashboard-content-grid" style={{ gridTemplateColumns: '1fr' }}>
-        
+
         {/* Payments Table */}
         <div className="card recent-applications">
           <h3>Payment Queue</h3>
@@ -96,40 +79,18 @@ const FinanceOfficerDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              <PaymentRow 
-                id="APP-2024-032" 
-                applicantName="Priya Sharma" 
-                bankDetails="SBI - xxxx1234" 
-                amount="50,000" 
+              <PaymentRow
+                id="APP-2024-032"
+                applicantName="Priya Sharma"
+                bankDetails="SBI - xxxx1234"
+                amount="50,000"
               />
             </tbody>
           </table>
         </div>
-        
-        {/* Utilization Reports Table */}
-        <div className="card recent-applications" style={{ marginTop: '2rem' }}>
-          <h3>Utilization Reports (Read-Only)</h3>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>App ID</th>
-                <th>Beneficiary Name</th>
-                <th>Scheme Name</th>
-                <th>Amount Received</th>
-                <th>Purpose</th>
-                <th>Uploaded Bills</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {utilizationReports.map((report) => (
-                <UtilizationReportRow key={report.id} report={report} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
+
+
+
       </div>
     </div>
   );
