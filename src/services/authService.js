@@ -20,12 +20,9 @@ export const authService = {
             return { success: true, ...data };
         } catch (error) {
             console.error('[authService] Login error:', error);
-            // Fallback for development if backend server is starting up or in offline demo mode
-            localStorage.setItem('jwtToken', 'demo-jwt-token');
-            localStorage.setItem('isAuthenticated', 'true');
-            localStorage.setItem('userRole', role);
-            return { success: true, token: 'demo-jwt-token', role };
+            return { success: false, error: error.message || 'Invalid credentials or login failed.' };
         }
+
     },
 
     register: async (userData) => {

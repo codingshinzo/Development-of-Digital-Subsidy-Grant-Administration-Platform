@@ -26,7 +26,8 @@ const Login = () => {
     try {
       const response = await authService.login(email, password, role);
 
-      if (response.success || response.token) {
+      if (response.success && response.token) {
+
         const userRole = response.role || role;
         let dashboardPath = '/dashboard';
         if (userRole === 'FIELD_OFFICER' || userRole === 'Field Officer') dashboardPath = '/field-officer';
