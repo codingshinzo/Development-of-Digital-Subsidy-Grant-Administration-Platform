@@ -40,3 +40,9 @@ dist/
 ### Environment Variables ###
 .env
 .env.local
+/target/
+/node_modules/
+/.mvn/
+/__pycache__/
+*.class
+.DS_Store
