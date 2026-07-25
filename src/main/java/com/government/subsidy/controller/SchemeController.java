@@ -29,9 +29,11 @@ public class SchemeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Scheme> getSchemeById(@PathVariable Long id) {
-        return schemeService.getSchemeById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Scheme scheme = schemeService.getSchemeById(id);
+        if (scheme != null) {
+            return ResponseEntity.ok(scheme);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping

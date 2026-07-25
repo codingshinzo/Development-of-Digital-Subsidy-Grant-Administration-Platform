@@ -1,14 +1,10 @@
 package com.government.subsidy.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "eligibility_rules")
-@Getter
-@Setter
 public class EligibilityRule {
 
     @Id
@@ -24,4 +20,27 @@ public class EligibilityRule {
     private BigDecimal minValue;
     private BigDecimal maxValue;
     private Boolean isActive;
+
+    public EligibilityRule() {}
+
+    public Long getRuleId() { return ruleId; }
+    public void setRuleId(Long ruleId) { this.ruleId = ruleId; }
+
+    public Scheme getScheme() { return scheme; }
+    public void setScheme(Scheme scheme) { this.scheme = scheme; }
+
+    public String getRuleDescription() { return ruleDescription; }
+    public void setRuleDescription(String ruleDescription) { this.ruleDescription = ruleDescription; }
+
+    public String getCriteriaType() { return criteriaType; }
+    public void setCriteriaType(String criteriaType) { this.criteriaType = criteriaType; }
+
+    public BigDecimal getMinValue() { return minValue; }
+    public void setMinValue(BigDecimal minValue) { this.minValue = minValue; }
+
+    public BigDecimal getMaxValue() { return maxValue; }
+    public void setMaxValue(BigDecimal maxValue) { this.maxValue = maxValue; }
+
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 }

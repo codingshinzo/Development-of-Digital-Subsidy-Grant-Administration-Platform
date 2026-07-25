@@ -4,6 +4,7 @@ import com.government.subsidy.dto.JwtResponse;
 import com.government.subsidy.dto.LoginRequest;
 import com.government.subsidy.dto.SignupRequest;
 import com.government.subsidy.exception.ResourceNotFoundException;
+import com.government.subsidy.model.Role;
 import com.government.subsidy.model.User;
 import com.government.subsidy.repository.UserRepository;
 import com.government.subsidy.security.JwtUtils;
@@ -56,7 +57,18 @@ public class AuthService {
         user.setEmail(signupRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
         user.setFullName(signupRequest.getFullName());
-        user.setRole(signupRequest.getRole());
+        
+        Role userRole = Role.CITIZEN;
+        if (signupRequest.getRole() != null) {
+            String roleStr = signupRequest.getRole().toUpperCase().replace(" ", "_");
+            if (roleStr.equals("BENEFICIARY")) roleStr = "CITIZEN";
+            try {
+                userRole = Role.valueOf(roleStr);
+            } catch (Exception e) {
+                userRole = Role.CITIZEN;
+            }
+        }
+        user.setRole(userRole);
 
         userRepository.save(user);
         return "User registered successfully!";

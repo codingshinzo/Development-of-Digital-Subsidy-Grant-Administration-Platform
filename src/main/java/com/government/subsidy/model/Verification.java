@@ -1,14 +1,10 @@
 package com.government.subsidy.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "verifications")
-@Getter
-@Setter
 public class Verification {
 
     @Id
@@ -28,4 +24,24 @@ public class Verification {
 
     @Column(columnDefinition = "TEXT")
     private String remarks;
+
+    public Verification() {}
+
+    public Long getVerificationId() { return verificationId; }
+    public void setVerificationId(Long verificationId) { this.verificationId = verificationId; }
+
+    public Document getDocument() { return document; }
+    public void setDocument(Document document) { this.document = document; }
+
+    public Officer getOfficer() { return officer; }
+    public void setOfficer(Officer officer) { this.officer = officer; }
+
+    public LocalDate getVerificationDate() { return verificationDate; }
+    public void setVerificationDate(LocalDate verificationDate) { this.verificationDate = verificationDate; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
 }

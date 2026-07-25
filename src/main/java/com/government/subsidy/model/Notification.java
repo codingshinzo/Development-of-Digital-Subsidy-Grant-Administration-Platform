@@ -1,14 +1,10 @@
 package com.government.subsidy.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notifications")
-@Getter
-@Setter
 public class Notification {
 
     @Id
@@ -29,4 +25,24 @@ public class Notification {
     private String status = "UNREAD";
 
     private LocalDateTime createdDate = LocalDateTime.now();
+
+    public Notification() {}
+
+    public Long getNotificationId() { return notificationId; }
+    public void setNotificationId(Long notificationId) { this.notificationId = notificationId; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+
+    public Application getApplication() { return application; }
+    public void setApplication(Application application) { this.application = application; }
+
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public LocalDateTime getCreatedDate() { return createdDate; }
+    public void setCreatedDate(LocalDateTime createdDate) { this.createdDate = createdDate; }
 }
