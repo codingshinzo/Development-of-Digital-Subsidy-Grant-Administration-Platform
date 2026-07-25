@@ -1,6 +1,7 @@
 package com.government.subsidy.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -18,10 +19,12 @@ public class Application {
 
     @ManyToOne
     @JoinColumn(name = "scheme_id", nullable = false)
+    @NotNull(message = "Scheme is required")
     private Scheme scheme;
 
     @ManyToOne
     @JoinColumn(name = "beneficiary_id", nullable = false)
+    @NotNull(message = "Beneficiary is required")
     private BeneficiaryProfile beneficiary;
 
     @Enumerated(EnumType.STRING)
