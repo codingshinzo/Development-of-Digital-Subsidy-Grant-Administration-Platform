@@ -1,40 +1,35 @@
 package com.government.subsidy.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "beneficiary_profiles")
-public class BeneficiaryProfile {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Table(name = "beneficiaries")
+public class Beneficiary extends User {
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Column(unique = true, nullable = false)
+    @Column(length = 12, nullable = false)
     private String aadhaarNumber;
+
+    private String category;
+    private Double income;
 
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    @Column(nullable = false)
     private String bankAccountNumber;
-
-    @Column(nullable = false)
     private String ifscCode;
 
-    public BeneficiaryProfile() {}
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public Beneficiary() {}
 
     public String getAadhaarNumber() { return aadhaarNumber; }
     public void setAadhaarNumber(String aadhaarNumber) { this.aadhaarNumber = aadhaarNumber; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public Double getIncome() { return income; }
+    public void setIncome(Double income) { this.income = income; }
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }

@@ -1,16 +1,10 @@
 package com.government.subsidy.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "audit_logs")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class AuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,12 +13,28 @@ public class AuditLog {
     @Column(nullable = false)
     private String action;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(nullable = false)
+    private String performedBy;
 
     private LocalDateTime timestamp = LocalDateTime.now();
 
     @Column(columnDefinition = "TEXT")
     private String details;
+
+    public AuditLog() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getAction() { return action; }
+    public void setAction(String action) { this.action = action; }
+
+    public String getPerformedBy() { return performedBy; }
+    public void setPerformedBy(String performedBy) { this.performedBy = performedBy; }
+
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public String getDetails() { return details; }
+    public void setDetails(String details) { this.details = details; }
 }

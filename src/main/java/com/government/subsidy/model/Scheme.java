@@ -1,23 +1,15 @@
 package com.government.subsidy.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 @Entity
 @Table(name = "schemes")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Scheme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank(message = "Scheme name is required")
     private String name;
 
     @Column(columnDefinition = "TEXT")
@@ -30,4 +22,33 @@ public class Scheme {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    public Scheme() {}
+
+    public Scheme(Long id, String name, String description, String eligibilityCriteria, Double budget, boolean active) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.eligibilityCriteria = eligibilityCriteria;
+        this.budget = budget;
+        this.active = active;
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getEligibilityCriteria() { return eligibilityCriteria; }
+    public void setEligibilityCriteria(String eligibilityCriteria) { this.eligibilityCriteria = eligibilityCriteria; }
+
+    public Double getBudget() { return budget; }
+    public void setBudget(Double budget) { this.budget = budget; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

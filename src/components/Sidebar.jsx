@@ -1,127 +1,117 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   FaHome, FaFileAlt, FaUserEdit, FaCheckCircle,
-  FaMoneyBillWave, FaUsers, FaChartBar, FaSignOutAlt
+  FaMoneyBillWave, FaChartBar, FaSignOutAlt, FaPlusCircle, FaSearch, FaHistory
 } from 'react-icons/fa';
-import '../styles/Sidebar.css';
-
-// ---------------------------------------------------------
-// Helper Component
-// ---------------------------------------------------------
-
-function SidebarLink({ path, icon, name, isExact }) {
-  const handleLogoutClick = () => {
-    if (path === '/') {
-      localStorage.removeItem('isAuthenticated');
-    }
-  };
-
-  return (
-    <li>
-      <NavLink
-        to={path}
-        end={isExact}
-        onClick={handleLogoutClick}
-        className={({ isActive }) => (isActive ? 'sidebar-link active' : 'sidebar-link')}
-      >
-        <span className="sidebar-icon">{icon}</span>
-        {name}
-      </NavLink>
-    </li>
-  );
-}
-
-// ---------------------------------------------------------
-// Main Component
-// ---------------------------------------------------------
+import { authService } from '../services/authService';
 
 const Sidebar = () => {
-  const location = useLocation();
-  const currentPath = location.pathname;
+  const navigate = useNavigate();
+  const rawRole = localStorage.getItem('userRole') || localStorage.getItem('role') || 'CITIZEN';
+  const userName = localStorage.getItem('userName') || 'User';
 
-  // Get role from localStorage, fallback to Beneficiary
-  let currentRole = localStorage.getItem('role') || 'Beneficiary';
+  const role = rawRole.toUpperCase().replace(' ', '_');
 
-  // Define navigation links based on the role
   let navLinks = [];
 
-  if (currentRole === 'Field Officer') {
+  if (role === 'FIELD_OFFICER') {
     navLinks = [
-      { name: 'Dashboard', path: '/field-officer', icon: <FaHome /> },
-      { name: 'Pending Verifications', path: '/field-officer/pending', icon: <FaFileAlt /> },
-      { name: 'Profile', path: '/profile', icon: <FaUserEdit /> },
-      { name: 'Log Out', path: '/', icon: <FaSignOutAlt /> },
+      { name: 'Field Verification Queue', path: '/field-officer', icon: <FaFileAlt /> },
+      { name: 'Track Status', path: '/track-status', icon: <FaSearch /> },
+      { name: 'My Profile', path: '/profile', icon: <FaUserEdit /> },
     ];
-  } else if (currentRole === 'District Officer') {
+  } else if (role === 'DISTRICT_OFFICER') {
     navLinks = [
-      { name: 'Dashboard', path: '/district-officer', icon: <FaHome /> },
-      { name: 'Pending Approvals', path: '/district-officer/pending', icon: <FaCheckCircle /> },
-      { name: 'Profile', path: '/profile', icon: <FaUserEdit /> },
-      { name: 'Log Out', path: '/', icon: <FaSignOutAlt /> },
+      { name: 'District Review Portal', path: '/district-officer', icon: <FaCheckCircle /> },
+      { name: 'Track Applications', path: '/track-status', icon: <FaSearch /> },
+      { name: 'My Profile', path: '/profile', icon: <FaUserEdit /> },
     ];
-  } else if (currentRole === 'Finance Officer') {
+  } else if (role === 'FINANCE_OFFICER') {
     navLinks = [
-      { name: 'Dashboard', path: '/finance-officer', icon: <FaHome /> },
-      { name: 'Payment Queue', path: '/finance-officer/payments', icon: <FaMoneyBillWave /> },
-      { name: 'Profile', path: '/profile', icon: <FaUserEdit /> },
-      { name: 'Log Out', path: '/', icon: <FaSignOutAlt /> },
+      { name: 'Disbursement Queue', path: '/finance-officer', icon: <FaMoneyBillWave /> },
+      { name: 'Utilization Reports', path: '/utilization-report', icon: <FaChartBar /> },
+      { name: 'My Profile', path: '/profile', icon: <FaUserEdit /> },
     ];
-  } else if (currentRole === 'Admin') {
+  } else if (role === 'ADMIN') {
     navLinks = [
-      { name: 'Dashboard', path: '/admin', icon: <FaHome /> },
-      { name: 'Manage Users', path: '/admin/users', icon: <FaUsers /> },
-      { name: 'Manage Schemes', path: '/admin/schemes', icon: <FaFileAlt /> },
-      { name: 'Reports', path: '/admin/reports', icon: <FaChartBar /> },
-      { name: 'Profile', path: '/profile', icon: <FaUserEdit /> },
-      { name: 'Log Out', path: '/', icon: <FaSignOutAlt /> },
+      { name: 'System Control Panel', path: '/admin', icon: <FaHome /> },
+      { name: 'Schemes Management', path: '/schemes', icon: <FaFileAlt /> },
+      { name: 'Audit & Reports', path: '/utilization-report', icon: <FaChartBar /> },
+      { name: 'My Profile', path: '/profile', icon: <FaUserEdit /> },
     ];
   } else {
-    // Default Beneficiary Links
+    // Default Citizen / Beneficiary
     navLinks = [
-      { name: 'Dashboard', path: '/dashboard', icon: <FaHome /> },
-      { name: 'Schemes', path: '/schemes', icon: <FaFileAlt /> },
-      { name: 'Track Status', path: '/track-status', icon: <FaChartBar /> },
-      { name: 'Utilization Report', path: '/utilization-report', icon: <FaFileAlt /> },
-      { name: 'Profile', path: '/profile', icon: <FaUserEdit /> },
-      { name: 'Log Out', path: '/', icon: <FaSignOutAlt /> },
+      { name: 'My Applications', path: '/dashboard', icon: <FaHome /> },
+      { name: 'Apply for Scheme', path: '/apply', icon: <FaPlusCircle /> },
+      { name: 'Track Status', path: '/track-status', icon: <FaSearch /> },
+      { name: 'Available Schemes', path: '/schemes', icon: <FaFileAlt /> },
+      { name: 'Fund Utilization', path: '/utilization-report', icon: <FaChartBar /> },
+      { name: 'My Profile', path: '/profile', icon: <FaUserEdit /> },
     ];
   }
 
-  return (
-    <aside className="sidebar">
+  const handleLogout = () => {
+    authService.logout();
+    navigate('/login');
+  };
 
-      {/* Profile Section inside Sidebar */}
-      <div className="sidebar-profile">
-        <div className="avatar">
-          {currentRole.charAt(0)}
+  return (
+    <aside className="glass-card" style={{ width: '260px', borderRadius: '0', minHeight: 'calc(100vh - 70px)', padding: '1.5rem 1rem', borderTop: 0, borderBottom: 0, borderLeft: 0 }}>
+      {/* Profile summary */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', paddingBottom: '1.25rem', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)' }}>
+        <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'var(--gradient-brand)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem' }}>
+          {userName.charAt(0).toUpperCase()}
         </div>
-        <div className="user-info">
-          <h4>{currentRole} User</h4>
-          <p>{currentRole}</p>
+        <div>
+          <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#fff', margin: 0 }}>{userName}</h4>
+          <span className="badge badge-submitted" style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', marginTop: '0.2rem' }}>
+            {role.replace('_', ' ')}
+          </span>
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="sidebar-nav">
-        <ul>
-          {navLinks.map((link, index) => {
-            // Determine if the link should exactly match the path (to prevent active state bugs)
-            const isExactMatch = link.path === '/dashboard' || link.path.endsWith('-officer') || link.path.endsWith('admin') || link.path === '/';
-
-            return (
-              <SidebarLink
-                key={index}
-                path={link.path}
-                icon={link.icon}
-                name={link.name}
-                isExact={isExactMatch}
-              />
-            );
-          })}
+      {/* Navigation Menu */}
+      <nav>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          {navLinks.map((item, idx) => (
+            <li key={idx}>
+              <NavLink
+                to={item.path}
+                style={({ isActive }) => ({
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.85rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive ? '#ffffff' : '#94a3b8',
+                  background: isActive ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                  border: isActive ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid transparent',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '0.9rem',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                })}
+              >
+                <span style={{ fontSize: '1.05rem', color: 'var(--accent-blue)' }}>{item.icon}</span>
+                {item.name}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
 
+      {/* Logout button */}
+      <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+        <button
+          onClick={handleLogout}
+          className="btn-outline"
+          style={{ width: '100%', justifyContent: 'center', color: '#fb7185', borderColor: 'rgba(244, 63, 94, 0.2)', fontSize: '0.88rem' }}
+        >
+          <FaSignOutAlt /> Sign Out
+        </button>
+      </div>
     </aside>
   );
 };

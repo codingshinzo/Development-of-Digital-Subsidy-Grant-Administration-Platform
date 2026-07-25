@@ -1,146 +1,172 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaShieldAlt, FaMapMarkedAlt, FaSearchDollar } from 'react-icons/fa';
-import { schemesData } from '../data/schemes';
+import { Link } from 'react-router-dom';
+import {
+  FaCheckCircle, FaShieldAlt, FaChartLine, FaUserCheck,
+  FaFileInvoiceDollar, FaBuilding, FaArrowRight, FaTasks, FaCalculator
+} from 'react-icons/fa';
 
 const Home = () => {
-  const navigate = useNavigate();
-
-  // Get the first 3 active schemes for the "Latest Schemes" section
-  const latestSchemes = schemesData.filter(s => s.status === 'Active').slice(0, 3);
-
   return (
-    <div className="home-container animate-fade-in" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className="home-container animate-fade-in" style={{ paddingBottom: '3rem' }}>
       
-      {/* --------------------------------------------
-          Hero Section 
-          -------------------------------------------- */}
-      <section className="hero-section" style={{ 
-        textAlign: 'center', 
-        padding: '6rem 1.5rem', 
-        background: 'linear-gradient(135deg, var(--primary-color) 0%, #1e293b 100%)', 
-        color: 'white' 
-      }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '3rem', fontWeight: '700', marginBottom: '1.5rem', letterSpacing: '-0.5px', lineHeight: '1.2' }}>
-            Government Subsidy & Grant Disbursement
-          </h1>
-          <p style={{ fontSize: '1.25rem', margin: '0 auto', lineHeight: '1.6', opacity: '0.9', fontWeight: '300' }}>
-            A secure, transparent, and efficient platform for accessing government schemes and managing your applications.
-          </p>
-          <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-            <Link to="/all-schemes" className="btn btn-secondary" style={{ backgroundColor: 'white', color: 'var(--primary-color)', padding: '0.875rem 1.75rem', fontSize: '1.05rem', fontWeight: '500', borderRadius: '6px', border: 'none' }}>
-              Explore Schemes
-            </Link>
-            <Link to="/login" className="btn btn-primary" style={{ border: '1px solid rgba(255,255,255,0.4)', padding: '0.875rem 1.75rem', fontSize: '1.05rem', fontWeight: '500', background: 'transparent', borderRadius: '6px' }}>
-              Sign In
-            </Link>
-          </div>
+      {/* Hero Section */}
+      <section className="hero-section glass-card" style={{ borderRadius: 'var(--radius-xl)', padding: '3.5rem 2rem', marginBottom: '3rem' }}>
+        <span className="badge badge-submitted" style={{ marginBottom: '1rem', padding: '0.4rem 1rem' }}>
+          <FaShieldAlt /> Government Direct Benefit Transfer Portal
+        </span>
+        <h1 className="hero-title">
+          Transparent & Digitized Government Subsidy Tracking
+        </h1>
+        <p className="hero-subtitle">
+          Empowering citizens with automated eligibility verification, multi-stage transparent officer approvals, and direct bank disbursement tracking.
+        </p>
+
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link to="/apply" className="btn-brand" style={{ padding: '0.85rem 2rem', fontSize: '1.05rem' }}>
+            Apply for Subsidy <FaArrowRight />
+          </Link>
+          <Link to="/track-status" className="btn-outline" style={{ padding: '0.85rem 2rem', fontSize: '1.05rem' }}>
+            Track Application Status
+          </Link>
         </div>
       </section>
 
-      {/* --------------------------------------------
-          Statistics Section
-          -------------------------------------------- */}
-      <section className="statistics-section container" style={{ padding: '4rem 1.5rem', borderBottom: '1px solid var(--border-color)' }}>
-        <div className="dashboard-content-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2.5rem' }}>
-          <div className="card" style={{ textAlign: 'center', padding: '2rem', backgroundColor: 'white', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <h3 style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '0.5rem', fontWeight: '700' }}>45+</h3>
-            <p style={{ color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px' }}>Active Schemes</p>
-          </div>
-          <div className="card" style={{ textAlign: 'center', padding: '2rem', backgroundColor: 'white', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <h3 style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '0.5rem', fontWeight: '700' }}>1.2M+</h3>
-            <p style={{ color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px' }}>Beneficiaries</p>
-          </div>
-          <div className="card" style={{ textAlign: 'center', padding: '2rem', backgroundColor: 'white', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <h3 style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '0.5rem', fontWeight: '700' }}>₹500Cr+</h3>
-            <p style={{ color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px' }}>Funds Disbursed</p>
-          </div>
-          <div className="card" style={{ textAlign: 'center', padding: '2rem', backgroundColor: 'white', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <h3 style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '0.5rem', fontWeight: '700' }}>28</h3>
-            <p style={{ color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '1px' }}>States Covered</p>
+      {/* Live Impact Counter */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon blue"><FaFileInvoiceDollar /></div>
+          <div className="stat-info">
+            <h4>₹ 12,450 Cr+</h4>
+            <p>Direct Grants Disbursed</p>
           </div>
         </div>
-      </section>
 
-      {/* --------------------------------------------
-          Latest Schemes (3 Cards)
-          -------------------------------------------- */}
-      <section className="latest-schemes-section container" style={{ padding: '5rem 1.5rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <h2 style={{ fontSize: '2.25rem', fontWeight: '700', color: 'var(--text-dark)' }}>Latest Schemes</h2>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem', fontSize: '1.1rem' }}>Discover new opportunities for support and growth.</p>
-        </div>
-        
-        <div className="dashboard-content-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem' }}>
-          {latestSchemes.map(scheme => (
-            <div key={scheme.id} className="card" style={{ padding: '2.5rem 2rem', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-color)', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', borderRadius: '12px' }}>
-              <span className="category-badge" style={{ alignSelf: 'flex-start', marginBottom: '1.5rem', fontSize: '0.8rem', padding: '0.4rem 1rem', backgroundColor: 'rgba(0,123,255,0.08)', color: 'var(--primary-color)', borderRadius: '30px', fontWeight: '600' }}>
-                {scheme.category}
-              </span>
-              <h3 style={{ marginBottom: '1rem', fontSize: '1.35rem', fontWeight: '700', color: 'var(--text-dark)' }}>{scheme.name}</h3>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem', flexGrow: 1, lineHeight: '1.7' }}>
-                {scheme.description}
-              </p>
-              <button 
-                className="btn btn-secondary btn-block"
-                style={{ backgroundColor: 'transparent', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', fontWeight: '600', padding: '0.75rem' }}
-                onClick={() => {
-                  if (!localStorage.getItem('isAuthenticated')) {
-                    alert("Please login first to apply for a scheme.");
-                  } else {
-                    navigate(`/apply?schemeId=${scheme.id}`);
-                  }
-                }}
-              >
-                Apply Now
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --------------------------------------------
-          Why Choose This Portal
-          -------------------------------------------- */}
-      <section id="about" className="why-choose-us-section" style={{ padding: '5rem 1.5rem', backgroundColor: '#f8fafc', borderTop: '1px solid var(--border-color)' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{ fontSize: '2.25rem', fontWeight: '700', color: 'var(--text-dark)' }}>Why Choose This Portal</h2>
-            <p style={{ color: 'var(--text-secondary)', marginTop: '0.75rem', fontSize: '1.1rem' }}>A modern approach to government services.</p>
+        <div className="stat-card">
+          <div className="stat-icon emerald"><FaUserCheck /></div>
+          <div className="stat-info">
+            <h4>4,85,000+</h4>
+            <p>Beneficiaries Enrolled</p>
           </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon amber"><FaTasks /></div>
+          <div className="stat-info">
+            <h4>98.4 %</h4>
+            <p>Verification Accuracy</p>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon purple"><FaChartLine /></div>
+          <div className="stat-info">
+            <h4>3-Stage</h4>
+            <p>Transparent Approval Chain</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 4-Step Approval Lifecycle */}
+      <section className="glass-card" style={{ padding: '2.5rem', margin: '3rem 0' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.8rem', color: '#fff' }}>How the Subsidy Workflow Operates</h2>
+          <p style={{ color: 'var(--text-muted)' }}>From online application to direct bank account disbursement</p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
           
-          <div className="dashboard-content-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '3.5rem' }}>
-            <div className="card" style={{ textAlign: 'center', padding: '3rem 2rem', backgroundColor: 'white', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-              <div style={{ width: '72px', height: '72px', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,123,255,0.1)', borderRadius: '50%', color: 'var(--primary-color)' }}>
-                <FaSearchDollar style={{ fontSize: '2rem' }} />
-              </div>
-              <h3 style={{ fontSize: '1.35rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--text-dark)' }}>Transparent</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7' }}>
-                Clear visibility into grant amounts, eligibility, and fund disbursement processes.
-              </p>
+          <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, marginBottom: '1rem' }}>
+              1
             </div>
-            
-            <div className="card" style={{ textAlign: 'center', padding: '3rem 2rem', backgroundColor: 'white', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-              <div style={{ width: '72px', height: '72px', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(40,167,69,0.1)', borderRadius: '50%', color: 'var(--success-color)' }}>
-                <FaShieldAlt style={{ fontSize: '2rem' }} />
-              </div>
-              <h3 style={{ fontSize: '1.35rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--text-dark)' }}>Secure</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7' }}>
-                Your data and documents are protected with industry-standard security protocols.
-              </p>
-            </div>
-            
-            <div className="card" style={{ textAlign: 'center', padding: '3rem 2rem', backgroundColor: 'white', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-              <div style={{ width: '72px', height: '72px', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,193,7,0.1)', borderRadius: '50%', color: 'var(--warning-color)' }}>
-                <FaMapMarkedAlt style={{ fontSize: '2rem' }} />
-              </div>
-              <h3 style={{ fontSize: '1.35rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--text-dark)' }}>Easy Tracking</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.7' }}>
-                Real-time application status tracking with clear, step-by-step timelines.
-              </p>
-            </div>
+            <h4 style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '0.5rem' }}>1. Citizen Submission</h4>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Fill online application form, select target scheme, and upload mandatory identity & income documents.</p>
           </div>
+
+          <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, marginBottom: '1rem' }}>
+              <FaCalculator />
+            </div>
+            <h4 style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '0.5rem' }}>2. Automated Scoring</h4>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>System computes an automated eligibility score out of 100 based on Income, Category, and Documents.</p>
+          </div>
+
+          <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(99, 102, 241, 0.2)', color: '#818cf8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, marginBottom: '1rem' }}>
+              3
+            </div>
+            <h4 style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '0.5rem' }}>3. 3-Officer Review</h4>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Field Officer ground-check $\rightarrow$ District Officer scrutiny $\rightarrow$ Finance Officer final approval.</p>
+          </div>
+
+          <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, marginBottom: '1rem' }}>
+              4
+            </div>
+            <h4 style={{ fontSize: '1.1rem', color: '#fff', marginBottom: '0.5rem' }}>4. Bank Disbursement</h4>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Direct credit to beneficiary bank account with instant transaction reference tracking number.</p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Featured Schemes Grid */}
+      <section style={{ margin: '3rem 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <div>
+            <h2 style={{ fontSize: '1.6rem', color: '#fff' }}>Featured Government Welfare Schemes</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Check eligibility guidelines and apply online</p>
+          </div>
+          <Link to="/all-schemes" className="btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+            View All Schemes $\rightarrow$
+          </Link>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          
+          <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <span className="badge badge-submitted" style={{ marginBottom: '0.75rem' }}>Housing Welfare</span>
+              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '0.5rem' }}>Pradhan Mantri Awas Yojana</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Financial housing assistance up to ₹2,50,000 for economically weaker sections & low income families.</p>
+              <div style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(15, 23, 42, 0.6)', borderRadius: 'var(--radius-md)' }}>
+                <strong>Eligibility:</strong> Annual income $\le$ ₹3,00,000 / Category: General, OBC, SC, ST
+              </div>
+            </div>
+            <Link to="/apply" className="btn-brand" style={{ width: '100%', justifyContent: 'center' }}>
+              Apply Now
+            </Link>
+          </div>
+
+          <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <span className="badge badge-approved" style={{ marginBottom: '0.75rem' }}>Agriculture</span>
+              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '0.5rem' }}>PM-KISAN Samman Nidhi</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Direct annual income support of ₹6,000 in three equal installments for land-holding farmer families.</p>
+              <div style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(15, 23, 42, 0.6)', borderRadius: 'var(--radius-md)' }}>
+                <strong>Eligibility:</strong> Small & marginal farmers with valid land records.
+              </div>
+            </div>
+            <Link to="/apply" className="btn-emerald" style={{ width: '100%', justifyContent: 'center' }}>
+              Apply Now
+            </Link>
+          </div>
+
+          <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <span className="badge badge-escalated" style={{ marginBottom: '0.75rem' }}>Education</span>
+              <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '0.5rem' }}>National Higher Education Grant</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>Merit-cum-means scholarship grant up to ₹50,000 annually for undergraduate & postgraduate students.</p>
+              <div style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '1.25rem', padding: '0.75rem', background: 'rgba(15, 23, 42, 0.6)', borderRadius: 'var(--radius-md)' }}>
+                <strong>Eligibility:</strong> Students with family annual income below ₹2,50,000.
+              </div>
+
+            </div>
+            <Link to="/apply" className="btn-brand" style={{ width: '100%', justifyContent: 'center' }}>
+              Apply Now
+            </Link>
+          </div>
+
         </div>
       </section>
 

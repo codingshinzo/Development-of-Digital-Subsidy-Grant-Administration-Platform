@@ -1,27 +1,24 @@
 package com.government.subsidy.model;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import java.time.LocalDate;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "officers")
-@Getter
-@Setter
-public class Officer {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long officerId;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+public class Officer extends User {
 
     private String designation;
     private String department;
     private String district;
-    private LocalDate joiningDate;
-    private String status;
+
+    public Officer() {}
+
+    public String getDesignation() { return designation; }
+    public void setDesignation(String designation) { this.designation = designation; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public String getDistrict() { return district; }
+    public void setDistrict(String district) { this.district = district; }
 }

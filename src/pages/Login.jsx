@@ -6,136 +6,113 @@ import { authService } from '../services/authService';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('Beneficiary');
-  const [rememberMe, setRememberMe] = useState(false);
-
-  // Validation state
-  const [errors, setErrors] = useState({});
+  const [role, setRole] = useState('CITIZEN');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigate();
 
-  const validate = () => {
-    const newErrors = {};
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
+    setErrorMessage('');
 
-    if (validate()) {
-      setIsLoading(true);
+    if (!email || !password) {
+      setErrorMessage('Please enter email/phone and password.');
+      return;
+    }
 
-      try {
-        // Call placeholder auth service
-        const response = await authService.login(email, password, role);
+    setIsLoading(true);
 
-        if (response.success) {
-          localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('role', role);
+    try {
+      const response = await authService.login(email, password, role);
 
-          let dashboardPath = '/dashboard';
-          if (role === 'Field Officer') dashboardPath = '/field-officer';
-          else if (role === 'District Officer') dashboardPath = '/district-officer';
-          else if (role === 'Finance Officer') dashboardPath = '/finance-officer';
-          else if (role === 'Admin') dashboardPath = '/admin';
+      if (response.success || response.token) {
+        const userRole = response.role || role;
+        let dashboardPath = '/dashboard';
+        if (userRole === 'FIELD_OFFICER' || userRole === 'Field Officer') dashboardPath = '/field-officer';
+        else if (userRole === 'DISTRICT_OFFICER' || userRole === 'District Officer') dashboardPath = '/district-officer';
+        else if (userRole === 'FINANCE_OFFICER' || userRole === 'Finance Officer') dashboardPath = '/finance-officer';
+        else if (userRole === 'ADMIN' || userRole === 'Admin') dashboardPath = '/admin';
 
-          navigate(dashboardPath);
-        }
-      } catch (error) {
-        console.error("Login failed", error);
-      } finally {
-        setIsLoading(false);
+        navigate(dashboardPath);
+      } else {
+        setErrorMessage(response.error || 'Invalid credentials or login failed.');
       }
+    } catch (error) {
+      setErrorMessage(error.message || 'Login error connecting to backend server.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="auth-page animate-fade-in">
-      <div className="auth-card">
-        <div className="auth-header">
-          <h2>Welcome Back</h2>
-          <p>Login to access your dashboard</p>
+    <div className="animate-fade-in" style={{ padding: '3rem 1rem' }}>
+      <div className="glass-card" style={{ maxWidth: '480px', margin: '0 auto', padding: '2.5rem' }}>
+        
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '1.8rem', color: '#fff' }}>Portal Authentication</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sign in to access your direct benefit transfer portal</p>
         </div>
 
+        {errorMessage && (
+          <div style={{ background: 'rgba(244, 63, 94, 0.15)', border: '1px solid #f43f5e', color: '#fb7185', padding: '0.85rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
+            {errorMessage}
+          </div>
+        )}
+
         <form onSubmit={handleLoginSubmit}>
-          <div className="input-group">
-            <label htmlFor="email"><FaEnvelope /> Email Address</label>
+          
+          <div className="form-group">
+            <label htmlFor="email"><FaEnvelope /> Email / Mobile Phone</label>
             <input
-              type="email"
+              type="text"
               id="email"
-              placeholder="Enter your email"
+              className="form-control"
+              placeholder="Enter email address or mobile"
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (errors.email) setErrors({ ...errors, email: '' });
-              }}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
-            {errors.email && <span style={{ color: 'var(--danger-color)', fontSize: '0.85rem', marginTop: '0.2rem', display: 'block' }}>{errors.email}</span>}
           </div>
 
-          <div className="input-group">
+          <div className="form-group">
             <label htmlFor="password"><FaLock /> Password</label>
             <input
               type="password"
               id="password"
-              placeholder="Enter your password"
+              className="form-control"
+              placeholder="Enter password"
               value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (errors.password) setErrors({ ...errors, password: '' });
-              }}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
-            {errors.password && <span style={{ color: 'var(--danger-color)', fontSize: '0.85rem', marginTop: '0.2rem', display: 'block' }}>{errors.password}</span>}
           </div>
 
-          <div className="input-group">
-            <label htmlFor="role"><FaUserShield /> Login As</label>
+          <div className="form-group">
+            <label htmlFor="role"><FaUserShield /> Sign In As</label>
             <select
               id="role"
+              className="form-control"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="Beneficiary">Beneficiary</option>
-              <option value="Field Officer">Field Officer</option>
-              <option value="District Officer">District Officer</option>
-              <option value="Finance Officer">Finance Officer</option>
-              <option value="Admin">Admin</option>
+              <option value="CITIZEN">Citizen / Beneficiary</option>
+              <option value="FIELD_OFFICER">Field Officer (Level 1)</option>
+              <option value="DISTRICT_OFFICER">District Officer (Level 2)</option>
+              <option value="FINANCE_OFFICER">Finance Officer (Level 3)</option>
+              <option value="ADMIN">System Administrator</option>
             </select>
           </div>
 
-          <div className="auth-options">
-            <label>
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              /> Remember Me
-            </label>
-            <a href="#" className="forgot-password">Forgot Password?</a>
-          </div>
-
-          <button type="submit" className="btn btn-primary btn-block" disabled={isLoading}>
-            <FaSignInAlt /> {isLoading ? 'Logging in...' : 'Login'}
+          <button type="submit" className="btn-brand" style={{ width: '100%', justifyContent: 'center', marginTop: '1.5rem', padding: '0.85rem' }} disabled={isLoading}>
+            <FaSignInAlt /> {isLoading ? 'Authenticating with DB...' : 'Sign In'}
           </button>
         </form>
 
-        <div className="auth-footer">
-          <p>Don't have an account? <Link to="/register">Register here</Link></p>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+          Don't have an account? <Link to="/register" style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>Register here</Link>
         </div>
+
       </div>
     </div>
   );

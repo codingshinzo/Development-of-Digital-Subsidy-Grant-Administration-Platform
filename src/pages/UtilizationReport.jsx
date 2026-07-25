@@ -1,188 +1,102 @@
-import React, { useState } from 'react';
-import '../styles/UtilizationReport.css';
+import React, { useState, useEffect } from 'react';
+import { FaChartBar, FaMoneyBillWave, FaLandmark, FaCheckCircle, FaChartPie } from 'react-icons/fa';
+import { applicationService } from '../services/applicationService';
+import { paymentService } from '../services/paymentService';
 
 const UtilizationReport = () => {
-  const [formData, setFormData] = useState({
-    purpose: '',
-    amountUtilized: '',
-    utilizationDate: '',
-    billFile: null,
-    photoFile: null,
-    remarks: '',
-    declaration: false
-  });
+  const [apps, setApps] = useState([]);
+  const [payments, setPayments] = useState([]);
 
-  const [submitted, setSubmitted] = useState(false);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  // Hardcoded details for demonstration as requested
-  const applicationDetails = {
-    applicationId: "APP-2024-123",
-    schemeName: "Agriculture Equipment Subsidy",
-    amountSanctioned: 75000,
-    amountReceived: 75000,
-    disbursementDate: "2024-07-01",
-    currentStatus: "Fund Disbursed"
-  };
-
-  const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
-    if (type === 'checkbox') {
-      setFormData({ ...formData, [name]: checked });
-    } else if (type === 'file') {
-      setFormData({ ...formData, [name]: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
+  const fetchData = async () => {
+    try {
+      const a = await applicationService.getApplications();
+      setApps(a || []);
+      const p = await paymentService.getPayments();
+      setPayments(p || []);
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (formData.declaration) {
-      // Logic to save to localStorage or dummy data would go here
-      setSubmitted(true);
-    } else {
-      alert("Please accept the declaration before submitting.");
-    }
-  };
-
-  if (applicationDetails.currentStatus !== "Fund Disbursed") {
-    return (
-      <div className="utilization-container">
-        <h2>Access Denied</h2>
-        <p>You can only submit a utilization report after the subsidy amount has been disbursed.</p>
-      </div>
-    );
-  }
+  const totalDisbursed = apps.filter(a => a.status === 'PAYMENT_SUCCESSFUL').length * 250000;
 
   return (
-    <div className="utilization-container animate-fade-in">
-      <div className="utilization-header">
-        <h2>Submit Utilization Report</h2>
-        <p>Provide details on how the disbursed subsidy amount was used.</p>
+    <div className="animate-fade-in" style={{ padding: '1rem 0' }}>
+      
+      <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
+        <span className="badge badge-submitted" style={{ marginBottom: '0.5rem' }}>Analytics & Transparency</span>
+        <h2 style={{ fontSize: '1.75rem', color: '#fff' }}>Fund Utilization & Disbursement Analytics</h2>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Real-time transparency reports on scheme budget utilization and district distribution.</p>
       </div>
 
-      {submitted ? (
-        <div className="card success-message">
-          <h3>Utilization Report Submitted Successfully</h3>
-          <p>Status: <span className="badge badge-warning">Pending Field Officer Verification</span></p>
+      <div className="stats-grid" style={{ marginBottom: '2.5rem' }}>
+        <div className="stat-card">
+          <div className="stat-icon emerald"><FaMoneyBillWave /></div>
+          <div className="stat-info">
+            <h4>₹ {totalDisbursed.toLocaleString()}</h4>
+            <p>Total Disbursed Subsidies</p>
+          </div>
         </div>
-      ) : (
-        <div className="utilization-content">
-          <div className="card application-details-card">
-            <h3>Application Details</h3>
-            <div className="details-grid">
-              <div className="detail-item">
-                <span className="detail-label">Application ID:</span>
-                <span className="detail-value">{applicationDetails.applicationId}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Scheme Name:</span>
-                <span className="detail-value">{applicationDetails.schemeName}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Amount Sanctioned:</span>
-                <span className="detail-value">₹{applicationDetails.amountSanctioned}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Amount Received:</span>
-                <span className="detail-value">₹{applicationDetails.amountReceived}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Disbursement Date:</span>
-                <span className="detail-value">{applicationDetails.disbursementDate}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Current Status:</span>
-                <span className="detail-value badge badge-success">{applicationDetails.currentStatus}</span>
-              </div>
+
+        <div className="stat-card">
+          <div className="stat-icon blue"><FaCheckCircle /></div>
+          <div className="stat-info">
+            <h4>{apps.filter(a => a.status === 'PAYMENT_SUCCESSFUL').length}</h4>
+            <p>Successful Grants</p>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon amber"><FaChartPie /></div>
+          <div className="stat-info">
+            <h4>99.2 %</h4>
+            <p>Fund Allocation Efficiency</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Distribution visual breakdown */}
+      <div className="glass-card" style={{ padding: '2rem' }}>
+        <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '1.5rem' }}>Scheme Budget Utilization Summary</h3>
+        
+        <div style={{ display: 'grid', gap: '1.25rem' }}>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.9rem', color: '#e2e8f0' }}>
+              <span>Pradhan Mantri Awas Yojana (Housing)</span>
+              <strong>78% Utilized (₹7.8 Cr / ₹10 Cr)</strong>
+            </div>
+            <div style={{ height: '10px', background: 'rgba(15, 23, 42, 0.8)', borderRadius: '5px', overflow: 'hidden' }}>
+              <div style={{ width: '78%', height: '100%', background: 'var(--gradient-brand)' }}></div>
             </div>
           </div>
 
-          <form className="card utilization-form" onSubmit={handleSubmit}>
-            <h3>Utilization Details</h3>
-            
-            <div className="form-group">
-              <label>Purpose of Utilization *</label>
-              <textarea 
-                name="purpose"
-                value={formData.purpose}
-                onChange={handleChange}
-                required
-                placeholder="Explain how the funds were used..."
-              ></textarea>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.9rem', color: '#e2e8f0' }}>
+              <span>PM-KISAN Samman Nidhi (Agriculture)</span>
+              <strong>92% Utilized (₹4.6 Cr / ₹5 Cr)</strong>
             </div>
-
-            <div className="form-group">
-              <label>Amount Utilized (₹) *</label>
-              <input 
-                type="number"
-                name="amountUtilized"
-                value={formData.amountUtilized}
-                onChange={handleChange}
-                required
-                min="1"
-              />
+            <div style={{ height: '10px', background: 'rgba(15, 23, 42, 0.8)', borderRadius: '5px', overflow: 'hidden' }}>
+              <div style={{ width: '92%', height: '100%', background: 'var(--gradient-emerald)' }}></div>
             </div>
+          </div>
 
-            <div className="form-group">
-              <label>Date of Utilization *</label>
-              <input 
-                type="date"
-                name="utilizationDate"
-                value={formData.utilizationDate}
-                onChange={handleChange}
-                required
-              />
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.9rem', color: '#e2e8f0' }}>
+              <span>National Higher Education Grant</span>
+              <strong>64% Utilized (₹1.9 Cr / ₹3 Cr)</strong>
             </div>
-
-            <div className="form-group">
-              <label>Upload Bills/Invoices *</label>
-              <input 
-                type="file"
-                name="billFile"
-                onChange={handleChange}
-                required
-              />
-              <small>Upload a PDF or Image file showing the proof of purchase.</small>
+            <div style={{ height: '10px', background: 'rgba(15, 23, 42, 0.8)', borderRadius: '5px', overflow: 'hidden' }}>
+              <div style={{ width: '64%', height: '100%', background: 'var(--gradient-amber)' }}></div>
             </div>
-
-            <div className="form-group">
-              <label>Upload Photos *</label>
-              <input 
-                type="file"
-                name="photoFile"
-                onChange={handleChange}
-                required
-              />
-              <small>Upload photos of equipment, setup, or related work.</small>
-            </div>
-
-            <div className="form-group">
-              <label>Additional Remarks</label>
-              <textarea 
-                name="remarks"
-                value={formData.remarks}
-                onChange={handleChange}
-                placeholder="Any additional information you want to provide..."
-              ></textarea>
-            </div>
-
-            <div className="form-group checkbox-group">
-              <input 
-                type="checkbox"
-                id="declaration"
-                name="declaration"
-                checked={formData.declaration}
-                onChange={handleChange}
-                required
-              />
-              <label htmlFor="declaration">I hereby declare that the information provided is true and accurate.</label>
-            </div>
-
-            <button type="submit" className="btn btn-primary submit-btn">Submit Report</button>
-          </form>
+          </div>
         </div>
-      )}
+
+      </div>
+
     </div>
   );
 };

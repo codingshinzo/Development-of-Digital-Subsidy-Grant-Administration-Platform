@@ -1,16 +1,10 @@
 package com.government.subsidy.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payment_records")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PaymentRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,4 +24,24 @@ public class PaymentRecord {
 
     @Column(nullable = false)
     private String status;
+
+    public PaymentRecord() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Application getApplication() { return application; }
+    public void setApplication(Application application) { this.application = application; }
+
+    public Double getAmount() { return amount; }
+    public void setAmount(Double amount) { this.amount = amount; }
+
+    public LocalDateTime getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(LocalDateTime paymentDate) { this.paymentDate = paymentDate; }
+
+    public String getTransactionId() { return transactionId; }
+    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

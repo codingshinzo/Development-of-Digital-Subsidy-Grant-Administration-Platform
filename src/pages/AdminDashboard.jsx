@@ -1,130 +1,161 @@
-import React from 'react';
-import { FaUsers, FaClipboardList, FaMoneyCheckAlt, FaChartPie, FaFileAlt, FaCheckCircle, FaTimesCircle, FaHourglassHalf } from 'react-icons/fa';
-import '../styles/Dashboard.css';
-import { utilizationReports } from '../data/utilizationReports';
-
-// ---------------------------------------------------------
-// Helper Components (Keeps the main component clean)
-// ---------------------------------------------------------
-
-function StatCard({ icon, title, value, type }) {
-  return (
-    <div className={`stat-card ${type}`}>
-      <div className="stat-icon">{icon}</div>
-      <div className="stat-info">
-        <h3>{title}</h3>
-        <p className="stat-value">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function ActivityRow({ activity, user, time }) {
-  return (
-    <tr>
-      <td>{activity}</td>
-      <td>{user}</td>
-      <td>{time}</td>
-    </tr>
-  );
-}
-
-function UtilizationReportRow({ report }) {
-  return (
-    <tr>
-      <td>{report.id}</td>
-      <td>{report.applicationId}</td>
-      <td>{report.beneficiaryName}</td>
-      <td>{report.schemeName}</td>
-      <td>₹{report.amountUtilized}</td>
-      <td><span className="badge badge-warning">{report.status}</span></td>
-      <td>{report.submittedDate}</td>
-    </tr>
-  );
-}
-
-// ---------------------------------------------------------
-// Main Dashboard Component
-// ---------------------------------------------------------
+import React, { useState, useEffect } from 'react';
+import { FaPlusCircle, FaFileAlt, FaUsers, FaChartBar, FaTasks, FaCheckCircle } from 'react-icons/fa';
+import { schemeService } from '../services/schemeService';
+import { applicationService } from '../services/applicationService';
 
 const AdminDashboard = () => {
-  return (
-    <div className="dashboard animate-fade-in">
+  const [schemes, setSchemes] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-      <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  // New scheme form state
+  const [newSchemeName, setNewSchemeName] = useState('');
+  const [newCategory, setNewCategory] = useState('General');
+  const [newDescription, setNewDescription] = useState('');
+  const [newBudget, setNewBudget] = useState('500000');
+  const [newCriteria, setNewCriteria] = useState('');
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const s = await schemeService.getSchemes();
+      setSchemes(s || []);
+      const a = await applicationService.getApplications();
+      setApplications(a || []);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleAddScheme = async (e) => {
+    e.preventDefault();
+    try {
+      await schemeService.createScheme({
+        name: newSchemeName,
+        category: newCategory,
+        description: newDescription,
+        budget: parseFloat(newBudget),
+        eligibilityCriteria: newCriteria,
+        active: true
+      });
+      alert('New subsidy scheme created successfully!');
+      setShowAddModal(false);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="animate-fade-in" style={{ padding: '1rem 0' }}>
+      
+      <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2>Admin Dashboard</h2>
-          <p>System overview and management.</p>
+          <span className="badge badge-submitted" style={{ marginBottom: '0.5rem' }}>Administrator Command Center</span>
+          <h2 style={{ fontSize: '1.75rem', color: '#fff' }}>System Management & Scheme Controls</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Define subsidy rules, manage active schemes, and monitor system audit logs.</p>
         </div>
-        <button
-          className="btn btn-danger"
-          onClick={() => { localStorage.removeItem('isAuthenticated'); window.location.href = '/'; }}
-        >
-          Log Out
+        <button onClick={() => setShowAddModal(true)} className="btn-brand">
+          <FaPlusCircle /> Add New Scheme
         </button>
       </div>
 
-      {/* Statistics Section */}
-      <div className="stats-grid">
-        <StatCard icon={<FaUsers />} title="Total Users" value="1,245" type="primary" />
-        <StatCard icon={<FaClipboardList />} title="Active Schemes" value="12" type="success" />
-        <StatCard icon={<FaMoneyCheckAlt />} title="Total Disbursed" value="₹4.2Cr" type="warning" />
-        <StatCard icon={<FaChartPie />} title="Pending Apps" value="342" type="danger" />
-      </div>
-
-      <h3 style={{ marginTop: '2rem', marginBottom: '1rem', color: 'var(--text-dark)' }}>Utilization Reports Overview</h3>
-      <div className="stats-grid">
-        <StatCard icon={<FaFileAlt />} title="Total Reports" value={utilizationReports.length.toString()} type="primary" />
-        <StatCard icon={<FaHourglassHalf />} title="Pending Verification" value="1" type="warning" />
-        <StatCard icon={<FaCheckCircle />} title="Verified" value="1" type="success" />
-        <StatCard icon={<FaTimesCircle />} title="Rejected" value="0" type="danger" />
-      </div>
-
-      <div className="dashboard-content-grid">
-
-        {/* System Activities Table */}
-        <div className="card recent-applications">
-          <h3>System Activities</h3>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Activity</th>
-                <th>User</th>
-                <th>Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              <ActivityRow activity="New Scheme Created" user="Admin" time="10 mins ago" />
-              <ActivityRow activity="Payment Batch Processed" user="Finance Officer" time="1 hour ago" />
-              <ActivityRow activity="New Field Officer Registered" user="Admin" time="3 hours ago" />
-            </tbody>
-          </table>
+      {/* Stats */}
+      <div className="stats-grid" style={{ marginBottom: '2rem' }}>
+        <div className="stat-card">
+          <div className="stat-icon blue"><FaFileAlt /></div>
+          <div className="stat-info">
+            <h4>{schemes.length}</h4>
+            <p>Active Schemes</p>
+          </div>
         </div>
+        <div className="stat-card">
+          <div className="stat-icon emerald"><FaTasks /></div>
+          <div className="stat-info">
+            <h4>{applications.length}</h4>
+            <p>Total Applications Received</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon amber"><FaCheckCircle /></div>
+          <div className="stat-info">
+            <h4>{applications.filter(a => a.status === 'PAYMENT_SUCCESSFUL').length}</h4>
+            <p>Disbursed Grants</p>
+          </div>
+        </div>
+      </div>
 
-        {/* Utilization Reports Table */}
-        <div className="card recent-applications" style={{ marginTop: '2rem' }}>
-          <h3>All Utilization Reports</h3>
-          <table className="data-table">
+      {/* Add Scheme Modal */}
+      {showAddModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <form onSubmit={handleAddScheme} className="glass-card" style={{ padding: '2rem', width: '100%', maxWidth: '550px' }}>
+            <h3 style={{ color: '#fff', marginBottom: '1.25rem' }}>Add New Government Scheme</h3>
+            
+            <div className="form-group">
+              <label>Scheme Name</label>
+              <input type="text" className="form-control" value={newSchemeName} onChange={e => setNewSchemeName(e.target.value)} required />
+            </div>
+
+            <div className="form-group">
+              <label>Category</label>
+              <input type="text" className="form-control" value={newCategory} onChange={e => setNewCategory(e.target.value)} required />
+            </div>
+
+            <div className="form-group">
+              <label>Grant Amount / Budget (₹)</label>
+              <input type="number" className="form-control" value={newBudget} onChange={e => setNewBudget(e.target.value)} required />
+            </div>
+
+            <div className="form-group">
+              <label>Eligibility Guidelines</label>
+              <textarea className="form-control" rows="2" value={newCriteria} onChange={e => setNewCriteria(e.target.value)} required />
+            </div>
+
+            <div className="form-group">
+              <label>Description</label>
+              <textarea className="form-control" rows="2" value={newDescription} onChange={e => setNewDescription(e.target.value)} required />
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+              <button type="button" onClick={() => setShowAddModal(false)} className="btn-outline">Cancel</button>
+              <button type="submit" className="btn-brand">Save Scheme</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Schemes List */}
+      <div className="glass-card" style={{ padding: '1.75rem' }}>
+        <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '1.25rem' }}>Configured Subsidy Schemes</h3>
+        <div className="custom-table-container">
+          <table className="custom-table">
             <thead>
               <tr>
-                <th>Report ID</th>
-                <th>App ID</th>
-                <th>Beneficiary Name</th>
-                <th>Scheme Name</th>
-                <th>Amount Utilized</th>
+                <th>Scheme ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Max Grant Amount</th>
                 <th>Status</th>
-                <th>Submitted Date</th>
               </tr>
             </thead>
             <tbody>
-              {utilizationReports.map((report) => (
-                <UtilizationReportRow key={report.id} report={report} />
+              {schemes.map(s => (
+                <tr key={s.id}>
+                  <td><strong>#SCH-{s.id}</strong></td>
+                  <td>{s.name}</td>
+                  <td>{s.category || 'Welfare'}</td>
+                  <td><strong style={{ color: '#34d399' }}>₹{(s.budget || s.maxAmount || 250000).toLocaleString()}</strong></td>
+                  <td><span className="badge badge-approved">Active</span></td>
+                </tr>
               ))}
             </tbody>
           </table>
         </div>
-
       </div>
+
     </div>
   );
 };

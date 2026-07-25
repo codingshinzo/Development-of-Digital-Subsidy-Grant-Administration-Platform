@@ -1,155 +1,133 @@
-import React from 'react';
-import { FaFileSignature, FaUserCheck, FaTimesCircle, FaTasks } from 'react-icons/fa';
-import '../styles/Dashboard.css';
-import { utilizationReports } from '../data/utilizationReports';
-
-// ---------------------------------------------------------
-// Helper Components (Keeps the main component clean)
-// ---------------------------------------------------------
-
-function StatCard({ icon, title, value, type }) {
-  return (
-    <div className={`stat-card ${type}`}>
-      <div className="stat-icon">{icon}</div>
-      <div className="stat-info">
-        <h3>{title}</h3>
-        <p className="stat-value">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function VerificationRow({ id, applicantName, schemeName, score, statusText, badgeClass }) {
-  // Determine score color based on value
-  let scoreClass = 'badge-warning';
-  if (score >= 80) scoreClass = 'badge-success';
-  else if (score < 50) scoreClass = 'badge-danger';
-
-  return (
-    <tr>
-      <td>{id}</td>
-      <td>{applicantName}</td>
-      <td>{schemeName}</td>
-      <td>
-        <span className={`badge ${scoreClass}`}>{score}%</span>
-      </td>
-      <td><span className={`badge ${badgeClass}`}>{statusText}</span></td>
-      <td><button className="btn btn-primary btn-sm">Verify Documents</button></td>
-    </tr>
-  );
-}
-
-function UtilizationReportRow({ report }) {
-  return (
-    <tr>
-      <td>{report.applicationId}</td>
-      <td>{report.beneficiaryName}</td>
-      <td>{report.schemeName}</td>
-      <td>₹{report.amountReceived}</td>
-      <td>{report.purpose}</td>
-      <td><a href="#" className="text-primary">View</a></td>
-      <td><span className="badge badge-warning">{report.status}</span></td>
-      <td>
-        <button className="btn btn-primary btn-sm" style={{ marginRight: '0.5rem' }}>View</button>
-        <button className="btn btn-success btn-sm" style={{ marginRight: '0.5rem' }}>Approve</button>
-        <button className="btn btn-danger btn-sm" style={{ marginRight: '0.5rem' }}>Reject</button>
-        <button className="btn btn-secondary btn-sm">Req. Proof</button>
-      </td>
-    </tr>
-  );
-}
-
-// ---------------------------------------------------------
-// Main Dashboard Component
-// ---------------------------------------------------------
+import React, { useState, useEffect } from 'react';
+import { FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaSearch, FaUserCheck } from 'react-icons/fa';
+import { applicationService } from '../services/applicationService';
 
 const FieldOfficerDashboard = () => {
+  const [applications, setApplications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const fetchApplications = async () => {
+    setIsLoading(true);
+    try {
+      const data = await applicationService.getApplications();
+      setApplications(data || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAction = async (appId, newStatus, actionName) => {
+    const remarks = prompt(`Enter Field Officer verification remarks for ${actionName}:`, `Field verification completed. Status updated to ${newStatus}.`);
+    if (remarks === null) return;
+
+    try {
+      await applicationService.updateStatus(appId, newStatus, remarks);
+      alert(`Application #APP-${appId} updated to ${newStatus}!`);
+      fetchApplications();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Filter for Level 1 queue
+  const pendingQueue = applications.filter(a => a.status === 'SUBMITTED' || a.status === 'IN_REVIEW');
+
   return (
-    <div className="dashboard animate-fade-in">
-
-      <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="animate-fade-in" style={{ padding: '1rem 0' }}>
+      
+      <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2>Field Officer Dashboard</h2>
-          <p>Review and verify applicant documents.</p>
+          <span className="badge badge-submitted" style={{ marginBottom: '0.5rem' }}>Level 1 Review Portal</span>
+          <h2 style={{ fontSize: '1.75rem', color: '#fff' }}>Field Officer Verification Dashboard</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Conduct ground verification, inspect uploaded documents, and approve or escalate applications.</p>
         </div>
-        <button
-          className="btn btn-danger"
-          onClick={() => { localStorage.removeItem('isAuthenticated'); window.location.href = '/'; }}
-        >
-          Log Out
-        </button>
       </div>
 
-      {/* Statistics Section */}
-      <div className="stats-grid">
-        <StatCard icon={<FaTasks />} title="Total Assigned" value="12" type="primary" />
-        <StatCard icon={<FaFileSignature />} title="Pending Verification" value="5" type="warning" />
-        <StatCard icon={<FaUserCheck />} title="Verified" value="6" type="success" />
-        <StatCard icon={<FaTimesCircle />} title="Rejected" value="1" type="danger" />
+      {/* Metric summary */}
+      <div className="stats-grid" style={{ marginBottom: '2rem' }}>
+        <div className="stat-card">
+          <div className="stat-icon blue"><FaUserCheck /></div>
+          <div className="stat-info">
+            <h4>{pendingQueue.length}</h4>
+            <p>Pending Ground Verification</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon emerald"><FaCheckCircle /></div>
+          <div className="stat-info">
+            <h4>{applications.filter(a => a.status === 'FIELD_VERIFIED').length}</h4>
+            <p>Verified & Escalated to Level 2</p>
+          </div>
+        </div>
       </div>
 
-      <div className="dashboard-content-grid" style={{ gridTemplateColumns: '1fr' }}>
+      {/* Queue Table */}
+      <div className="glass-card" style={{ padding: '1.75rem' }}>
+        <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '1.25rem' }}>Level 1 Verification Queue</h3>
 
-        {/* Pending Verifications Table */}
-        <div className="card recent-applications">
-          <h3>Pending Verifications</h3>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>App ID</th>
-                <th>Applicant Name</th>
-                <th>Scheme Name</th>
-                <th>Eligibility Scoring</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <VerificationRow
-                id="APP-2024-045"
-                applicantName="Ramesh Kumar"
-                schemeName="Solar Panel Subsidy"
-                score={85}
-                statusText="Verification Pending"
-                badgeClass="badge-warning"
-              />
-              <VerificationRow
-                id="APP-2024-051"
-                applicantName="Sunita Devi"
-                schemeName="Education Grant"
-                score={45}
-                statusText="Verification Pending"
-                badgeClass="badge-warning"
-              />
-            </tbody>
-          </table>
-        </div>
-
-        {/* Utilization Reports Table */}
-        <div className="card recent-applications" style={{ marginTop: '2rem' }}>
-          <h3>Utilization Reports</h3>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>App ID</th>
-                <th>Beneficiary Name</th>
-                <th>Scheme Name</th>
-                <th>Amount Received</th>
-                <th>Purpose</th>
-                <th>Uploaded Bills</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {utilizationReports.map((report) => (
-                <UtilizationReportRow key={report.id} report={report} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-
+        {isLoading ? (
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>Loading pending applications...</p>
+        ) : pendingQueue.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+            ✓ No pending applications in Field Officer queue.
+          </div>
+        ) : (
+          <div className="custom-table-container">
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>App ID</th>
+                  <th>Scheme</th>
+                  <th>Eligibility Score</th>
+                  <th>Auto Remarks</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingQueue.map((app) => (
+                  <tr key={app.id}>
+                    <td><strong>#APP-{app.id}</strong></td>
+                    <td>{app.scheme?.name || 'Subsidy Scheme'}</td>
+                    <td>
+                      <span style={{ fontWeight: 700, color: (app.eligibilityScore || 75) >= 60 ? '#34d399' : '#fb7185' }}>
+                        {app.eligibilityScore || 75} / 100
+                      </span>
+                    </td>
+                    <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '280px' }}>
+                      {app.remarks || 'Auto-eligibility score calculated.'}
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          onClick={() => handleAction(app.id, 'FIELD_VERIFIED', 'Approve & Escalate to District Officer')}
+                          className="btn-emerald"
+                          style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+                        >
+                          <FaCheckCircle /> Approve (Level 2)
+                        </button>
+                        <button
+                          onClick={() => handleAction(app.id, 'FIELD_REJECTED', 'Reject Application')}
+                          className="btn-outline"
+                          style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem', color: '#fb7185', borderColor: 'rgba(244, 63, 94, 0.3)' }}
+                        >
+                          <FaTimesCircle /> Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
+
     </div>
   );
 };

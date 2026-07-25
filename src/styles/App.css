@@ -1,108 +1,255 @@
-.app {
+/* App.css - Comprehensive Government Subsidy Tracking Portal Styles */
+
+/* Primary Buttons */
+.btn-brand {
+  background: var(--gradient-brand);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.btn-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+  color: #ffffff;
+}
+
+.btn-emerald {
+  background: var(--gradient-emerald);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-emerald:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Header & Hero Section */
+.hero-section {
+  position: relative;
+  padding: 4rem 1.5rem;
+  text-align: center;
+  background: radial-gradient(circle at top center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hero-title {
+  font-size: 2.75rem;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  max-width: 750px;
+  margin: 0 auto 2rem auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-icon.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.stat-icon.emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.stat-icon.amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.stat-icon.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+
+.stat-info h4 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.stat-info p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.1rem;
+}
+
+/* Workflow Chain Stepper */
+.workflow-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.workflow-step {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-}
-
-.main-content {
-  flex: 1;
-  padding: 2rem 0;
-}
-
-/* Auth Pages Styling */
-.auth-page {
-  display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 140px); /* Adjusting for navbar and footer roughly */
-  padding: 2rem;
-  background: linear-gradient(135deg, var(--bg-color) 0%, #e2e8f0 100%);
+  position: relative;
+  z-index: 2;
+  flex: 1;
 }
 
-.auth-card {
-  width: 100%;
-  max-width: 450px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+.step-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 2px solid #334155;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.workflow-step.completed .step-icon {
+  background: var(--accent-emerald);
+  border-color: var(--accent-emerald);
+  color: #ffffff;
+}
+
+.workflow-step.active .step-icon {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+}
+
+.step-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.workflow-step.active .step-label {
+  color: #ffffff;
+}
+
+/* Forms & Input Groups */
+.form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   padding: 2.5rem;
+  border-radius: var(--radius-xl);
+  max-width: 650px;
+  margin: 2rem auto;
 }
 
-.auth-header {
-  text-align: center;
-  margin-bottom: 2rem;
+.form-group {
+  margin-bottom: 1.5rem;
 }
 
-.auth-header h2 {
-  color: var(--primary-color);
-  font-size: 1.8rem;
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #cbd5e1;
   margin-bottom: 0.5rem;
 }
 
-.auth-header p {
-  color: var(--text-secondary);
+.form-control {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
 }
 
-.auth-footer {
-  margin-top: 1.5rem;
-  text-align: center;
-  font-size: 0.9rem;
+.form-control:focus {
+  border-color: var(--accent-blue);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-.auth-footer a {
-  font-weight: 600;
+/* Tables */
+.custom-table-container {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
 }
 
-.auth-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
-.auth-options label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
+.custom-table th {
+  background: rgba(15, 23, 42, 0.8);
+  color: #94a3b8;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
-/* Registration specific */
-.auth-card.register-card {
-  max-width: 600px;
+.custom-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  font-size: 0.92rem;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-@media (max-width: 600px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Dashboard Layout Styling */
-.dashboard-container {
-  display: flex;
-  flex: 1;
-}
-
-.dashboard-content {
-  flex: 1;
-  padding: 2rem;
-  background-color: var(--bg-color);
-  min-height: calc(100vh - 70px); /* Exclude navbar approx height */
-}
-
-@media (max-width: 768px) {
-  .dashboard-container {
-    flex-direction: column;
-  }
-  .dashboard-content {
-    padding: 1rem;
-  }
+.custom-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
 }
