@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long> {
-    List<Document> findByApplicationApplicationId(Long applicationId);
+    List<Document> findByApplicationId(Long applicationId);
 }

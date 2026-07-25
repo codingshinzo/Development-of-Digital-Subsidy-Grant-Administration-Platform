@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface WorkflowHistoryRepository extends JpaRepository<WorkflowHistory, Long> {
-    List<WorkflowHistory> findByApplicationApplicationIdOrderByActionDateDesc(Long applicationId);
+    List<WorkflowHistory> findByApplicationIdOrderByActionDateDesc(Long applicationId);
 }

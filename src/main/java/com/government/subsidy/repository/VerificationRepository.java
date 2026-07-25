@@ -8,6 +8,5 @@ import java.util.List;
 @Repository
 public interface VerificationRepository extends JpaRepository<Verification, Long> {
     List<Verification> findByDocumentDocumentId(Long documentId);
-
-    List<Verification> findByOfficerOfficerId(Long officerId);
+    List<Verification> findByOfficerId(Long officerId);
 }

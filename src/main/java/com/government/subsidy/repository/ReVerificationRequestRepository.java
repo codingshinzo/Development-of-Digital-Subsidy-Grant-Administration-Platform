@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface ReVerificationRequestRepository extends JpaRepository<ReVerificationRequest, Long> {
-    List<ReVerificationRequest> findByApplicationApplicationId(Long applicationId);
+    List<ReVerificationRequest> findByApplicationId(Long applicationId);
 }

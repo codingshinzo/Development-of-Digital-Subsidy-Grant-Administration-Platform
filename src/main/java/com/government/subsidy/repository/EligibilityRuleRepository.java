@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface EligibilityRuleRepository extends JpaRepository<EligibilityRule, Long> {
-    List<EligibilityRule> findBySchemeSchemeIdAndIsActiveTrue(Long schemeId);
+    List<EligibilityRule> findBySchemeIdAndIsActiveTrue(Long schemeId);
 }

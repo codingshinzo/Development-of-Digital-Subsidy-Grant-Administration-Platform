@@ -7,5 +7,5 @@ import java.util.Optional;
 
 @Repository
 public interface FundDisbursementRepository extends JpaRepository<FundDisbursement, Long> {
-    Optional<FundDisbursement> findByApplicationApplicationId(Long applicationId);
+    Optional<FundDisbursement> findByApplicationId(Long applicationId);
 }
