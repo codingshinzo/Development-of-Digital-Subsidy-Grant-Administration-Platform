@@ -46,3 +46,4 @@ dist/
 /__pycache__/
 *.class
 .DS_Store
+.env

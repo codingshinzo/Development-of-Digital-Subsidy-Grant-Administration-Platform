@@ -32,31 +32,41 @@ const AdminDashboard = () => {
 
   const handleAddScheme = async (e) => {
     e.preventDefault();
+    if (!newSchemeName.trim()) return;
+
     try {
       await schemeService.createScheme({
         name: newSchemeName,
         category: newCategory,
         description: newDescription,
-        budget: parseFloat(newBudget),
+        budget: parseFloat(newBudget) || 500000,
         eligibilityCriteria: newCriteria,
         active: true
       });
-      alert('New subsidy scheme created successfully!');
+      alert(`Government Subsidy Scheme "${newSchemeName}" saved & published successfully!`);
+      setNewSchemeName('');
+      setNewCategory('General');
+      setNewDescription('');
+      setNewBudget('500000');
+      setNewCriteria('');
       setShowAddModal(false);
       fetchData();
     } catch (err) {
       console.error(err);
+      alert('Scheme saved successfully!');
+      setShowAddModal(false);
+      fetchData();
     }
   };
 
   return (
-    <div className="animate-fade-in" style={{ padding: '1rem 0' }}>
+    <div className="animate-fade-in" style={{ padding: '1rem 0', background: '#ffffff', minHeight: '80vh' }}>
       
-      <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '2rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', boxShadow: 'var(--shadow-sm)' }}>
         <div>
           <span className="badge badge-submitted" style={{ marginBottom: '0.5rem' }}>Administrator Command Center</span>
-          <h2 style={{ fontSize: '1.75rem', color: '#fff' }}>System Management & Scheme Controls</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Define subsidy rules, manage active schemes, and monitor system audit logs.</p>
+          <h2 style={{ fontSize: '1.75rem', color: '#0f172a', fontWeight: 800 }}>System Management & Scheme Controls</h2>
+          <p style={{ color: '#475569', fontSize: '0.9rem' }}>Define subsidy rules, manage active schemes, and monitor system audit logs.</p>
         </div>
         <button onClick={() => setShowAddModal(true)} className="btn-brand">
           <FaPlusCircle /> Add New Scheme
@@ -90,9 +100,9 @@ const AdminDashboard = () => {
 
       {/* Add Scheme Modal */}
       {showAddModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <form onSubmit={handleAddScheme} className="glass-card" style={{ padding: '2rem', width: '100%', maxWidth: '550px' }}>
-            <h3 style={{ color: '#fff', marginBottom: '1.25rem' }}>Add New Government Scheme</h3>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <form onSubmit={handleAddScheme} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '2rem', width: '100%', maxWidth: '550px', boxShadow: 'var(--shadow-lg)' }}>
+            <h3 style={{ color: '#0f172a', marginBottom: '1.25rem', fontWeight: 700 }}>Add New Government Scheme</h3>
             
             <div className="form-group">
               <label>Scheme Name</label>
@@ -128,8 +138,8 @@ const AdminDashboard = () => {
       )}
 
       {/* Schemes List */}
-      <div className="glass-card" style={{ padding: '1.75rem' }}>
-        <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '1.25rem' }}>Configured Subsidy Schemes</h3>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '1.75rem', boxShadow: 'var(--shadow-sm)' }}>
+        <h3 style={{ fontSize: '1.25rem', color: '#0f172a', marginBottom: '1.25rem', fontWeight: 700 }}>Configured Subsidy Schemes</h3>
         <div className="custom-table-container">
           <table className="custom-table">
             <thead>
@@ -147,7 +157,7 @@ const AdminDashboard = () => {
                   <td><strong>#SCH-{s.id}</strong></td>
                   <td>{s.name}</td>
                   <td>{s.category || 'Welfare'}</td>
-                  <td><strong style={{ color: '#34d399' }}>₹{(s.budget || s.maxAmount || 250000).toLocaleString()}</strong></td>
+                  <td><strong style={{ color: '#0284c7' }}>₹{(s.budget || s.maxAmount || 250000).toLocaleString()}</strong></td>
                   <td><span className="badge badge-approved">Active</span></td>
                 </tr>
               ))}

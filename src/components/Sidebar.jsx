@@ -65,7 +65,7 @@ const Sidebar = () => {
           {userName.charAt(0).toUpperCase()}
         </div>
         <div>
-          <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#fff', margin: 0 }}>{userName}</h4>
+          <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>{userName}</h4>
           <span className="badge badge-submitted" style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', marginTop: '0.2rem' }}>
             {role.replace('_', ' ')}
           </span>

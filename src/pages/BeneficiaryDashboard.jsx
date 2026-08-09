@@ -45,15 +45,15 @@ const BeneficiaryDashboard = () => {
   };
 
   return (
-    <div className="dashboard-page animate-fade-in" style={{ padding: '1rem 0' }}>
+    <div className="dashboard-page animate-fade-in" style={{ padding: '1rem 0', background: '#ffffff', minHeight: '80vh' }}>
       
       {/* Welcome Banner */}
-      <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '2rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', boxShadow: 'var(--shadow-sm)' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', color: '#fff' }}>Welcome back, {userName}!</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Track your government subsidy applications and check real-time eligibility scores.</p>
+          <h2 style={{ fontSize: '1.75rem', color: '#0f172a', fontWeight: 800 }}>Welcome back, {userName}!</h2>
+          <p style={{ color: '#475569', fontSize: '0.95rem' }}>Track your government subsidy applications and check real-time eligibility scores.</p>
         </div>
-        <Link to="/apply" className="btn-brand">
+        <Link to="/apply" className="btn-brand" style={{ textDecoration: 'none' }}>
           <FaPlusCircle /> Apply New Scheme
         </Link>
       </div>
@@ -86,22 +86,22 @@ const BeneficiaryDashboard = () => {
       </div>
 
       {/* Applications Table */}
-      <div className="glass-card" style={{ padding: '1.75rem' }}>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '1.75rem', boxShadow: 'var(--shadow-sm)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.25rem', color: '#fff' }}>Your Subsidy Applications</h3>
-          <Link to="/track-status" className="btn-outline" style={{ padding: '0.4rem 0.85rem', fontSize: '0.85rem' }}>
+          <h3 style={{ fontSize: '1.25rem', color: '#0f172a', fontWeight: 700 }}>Your Subsidy Applications</h3>
+          <Link to="/track-status" className="btn-outline" style={{ padding: '0.4rem 0.85rem', fontSize: '0.85rem', textDecoration: 'none' }}>
             <FaSearch /> Visual Stage Tracker
           </Link>
         </div>
 
         {isLoading ? (
-          <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>Loading applications...</p>
+          <p style={{ color: '#64748b', textAlign: 'center', padding: '2rem' }}>Loading applications...</p>
         ) : applications.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3rem 1rem', background: 'rgba(15, 23, 42, 0.5)', borderRadius: 'var(--radius-lg)' }}>
-            <FaFileInvoiceDollar style={{ fontSize: '2.5rem', color: 'var(--text-dim)', marginBottom: '1rem' }} />
-            <h4 style={{ color: '#fff', marginBottom: '0.5rem' }}>No Active Applications Found</h4>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>You haven't submitted any subsidy applications yet.</p>
-            <Link to="/apply" className="btn-brand">Apply Now</Link>
+          <div style={{ textAlign: 'center', padding: '3rem 1rem', background: '#f8fafc', borderRadius: 'var(--radius-lg)', border: '1px solid #e2e8f0' }}>
+            <FaFileInvoiceDollar style={{ fontSize: '2.5rem', color: '#94a3b8', marginBottom: '1rem' }} />
+            <h4 style={{ color: '#0f172a', marginBottom: '0.5rem', fontWeight: 700 }}>No Active Applications Found</h4>
+            <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>You haven't submitted any subsidy applications yet.</p>
+            <Link to="/apply" className="btn-brand" style={{ textDecoration: 'none' }}>Apply Now</Link>
           </div>
         ) : (
           <div className="custom-table-container">
@@ -121,15 +121,15 @@ const BeneficiaryDashboard = () => {
                   <tr key={app.id}>
                     <td><strong>#APP-{app.id}</strong></td>
                     <td>{app.scheme?.name || 'Government Subsidy Scheme'}</td>
-                    <td>{app.submittedDate ? new Date(app.submittedDate).toLocaleDateString() : 'Today'}</td>
+                    <td>{app.submittedDate ? new Date(app.submittedDate).toLocaleDateString() : 'N/A'}</td>
                     <td>
-                      <span style={{ fontWeight: 700, color: (app.eligibilityScore || 80) >= 60 ? '#34d399' : '#fb7185' }}>
-                        {app.eligibilityScore || 80} / 100
+                      <span style={{ fontWeight: 700, color: (app.eligibilityScore ?? 0) >= 50 ? '#047857' : '#be123c' }}>
+                        {app.eligibilityScore ?? 0} / 100
                       </span>
                     </td>
                     <td>{getStatusBadge(app.status)}</td>
                     <td>
-                      <Link to="/track-status" className="btn-outline" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>
+                      <Link to="/track-status" className="btn-outline" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', textDecoration: 'none' }}>
                         Track
                       </Link>
                     </td>

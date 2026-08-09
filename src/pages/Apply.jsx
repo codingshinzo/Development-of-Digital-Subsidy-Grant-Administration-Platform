@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaFileInvoice, FaCalculator, FaCheckCircle, FaUpload, FaArrowRight } from 'react-icons/fa';
+import { 
+  FaFileInvoice, FaCalculator, FaCheckCircle, FaUpload, FaArrowRight, 
+  FaTractor, FaGraduationCap, FaHeartbeat, FaStore, FaTools, FaIdCard, FaUserCheck
+} from 'react-icons/fa';
 import { schemeService } from '../services/schemeService';
 import { applicationService } from '../services/applicationService';
 
@@ -12,7 +15,51 @@ const Apply = () => {
   const [category, setCategory] = useState('GENERAL');
   const [aadhaarNumber, setAadhaarNumber] = useState('');
   const [address, setAddress] = useState('');
-  const [documentType, setDocumentType] = useState('Income Certificate & Aadhaar Card');
+  
+  // Beneficiary Type details from session/localStorage
+  const beneficiaryType = localStorage.getItem('beneficiaryType') || 'FARMER';
+  const rawDetails = localStorage.getItem('beneficiaryDetails');
+  const specificDetails = rawDetails ? JSON.parse(rawDetails) : {};
+
+  // Custom document options tailored per Beneficiary Type
+  const getDocumentOptions = () => {
+    switch (beneficiaryType) {
+      case 'FARMER':
+        return [
+          'Land Pattadar Passbook & Khasra Record (Verified PDF)',
+          'PM-KISAN Farmer Registration & Aadhaar Copy',
+          'Soil Health Card & Bank Account Passbook'
+        ];
+      case 'STUDENT':
+        return [
+          'Current Semester Marksheet & Bonafide Certificate',
+          'College Identity Card & Admission Fee Receipt',
+          'Income Certificate & Student Bank Passbook'
+        ];
+      case 'SENIOR_CITIZEN':
+        return [
+          'Senior Citizen Identity Card & Age Proof',
+          'Medical Fitness Certificate & Pension Passbook',
+          'Aadhaar Card & Household Income Proof'
+        ];
+      case 'ENTREPRENEUR':
+        return [
+          'Udyam MSME Registration Certificate (Verified)',
+          'Business Project Report & GST Identification',
+          'Bank Statement (Last 6 Months) & PAN Card'
+        ];
+      case 'WORKER':
+      default:
+        return [
+          'E-Shram Labour Smart Card & Aadhaar Verification',
+          'Trade Union Membership Certificate & Bank Passbook',
+          'Income Certificate & Residential Address Proof'
+        ];
+    }
+  };
+
+  const docOptions = getDocumentOptions();
+  const [documentType, setDocumentType] = useState(docOptions[0]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -31,20 +78,34 @@ const Apply = () => {
     }
   };
 
-  // Automated Score Preview Calculation (Diagram v1.2: Income 30 pts, Category 40 pts, Document 30 pts)
+  // Automated Score Preview Calculation
   const calculateScorePreview = () => {
     let incScore = 30;
     const numIncome = parseFloat(income) || 0;
     if (numIncome > 300000) incScore = 10;
     else if (numIncome > 150000) incScore = 20;
 
-    let catScore = 40;
-    let docScore = 30;
+    let catScore = category === 'GENERAL' ? 30 : 40;
+    
+    // Dynamic Document Score: 0 if no Aadhaar/Doc, 15 if partial, 30 if 12-digit Aadhaar & document package attached
+    let docScore = 0;
+    const hasValidAadhaar = aadhaarNumber && aadhaarNumber.replace(/\D/g, '').length === 12;
+    const hasDocument = documentType && documentType.length > 0;
+
+    if (hasValidAadhaar && hasDocument) {
+      docScore = 30;
+    } else if (hasValidAadhaar || hasDocument) {
+      docScore = 15;
+    } else {
+      docScore = 0;
+    }
 
     return incScore + catScore + docScore;
   };
 
   const estimatedScore = calculateScorePreview();
+  const validAadhaar = aadhaarNumber && aadhaarNumber.replace(/\D/g, '').length === 12;
+  const docScoreDisplay = (validAadhaar && documentType) ? '30/30' : (validAadhaar || documentType) ? '15/30' : '0/30';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,6 +114,8 @@ const Apply = () => {
     try {
       const payload = {
         schemeId: selectedSchemeId || 1,
+        beneficiaryType,
+        specificDetails,
         income,
         category,
         aadhaarNumber,
@@ -75,16 +138,48 @@ const Apply = () => {
     }
   };
 
+  const getBeneficiaryIcon = () => {
+    switch (beneficiaryType) {
+      case 'FARMER': return <FaTractor style={{ color: '#2563eb' }} />;
+      case 'STUDENT': return <FaGraduationCap style={{ color: '#a855f7' }} />;
+      case 'SENIOR_CITIZEN': return <FaHeartbeat style={{ color: '#ca8a04' }} />;
+      case 'ENTREPRENEUR': return <FaStore style={{ color: '#059669' }} />;
+      case 'WORKER': default: return <FaTools style={{ color: '#0891b2' }} />;
+    }
+  };
+
   return (
     <div className="animate-fade-in" style={{ padding: '1rem 0' }}>
       
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '2rem', color: '#fff' }}>Apply for Government Subsidy</h2>
-        <p style={{ color: 'var(--text-muted)' }}>Complete the digital application for automated eligibility scoring & officer review.</p>
+        <h2 style={{ fontSize: '2rem', color: '#0f172a', fontWeight: 800 }}>Apply for Government Subsidy</h2>
+        <p style={{ color: '#475569' }}>Complete the digital application tailored for your beneficiary profile</p>
+      </div>
+
+      {/* Beneficiary Type Banner */}
+      <div style={{ maxWidth: '1050px', margin: '0 auto 1.5rem auto' }}>
+        <div style={{ background: '#ffffff', padding: '1rem 1.5rem', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '5px solid #2563eb', border: '1px solid #e2e8f0', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center' }}>
+              {getBeneficiaryIcon()}
+            </div>
+            <div>
+              <span style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                Applicant Category Profile
+              </span>
+              <h4 style={{ color: '#0f172a', fontSize: '1.1rem', margin: 0, fontWeight: 700 }}>
+                {beneficiaryType.replace('_', ' ')} Beneficiary
+              </h4>
+            </div>
+          </div>
+          <span className="badge badge-submitted" style={{ padding: '0.4rem 0.85rem' }}>
+            Profile Verified
+          </span>
+        </div>
       </div>
 
       {successMessage && (
-        <div style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', color: '#34d399', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 600 }}>
+        <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#047857', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 700, maxWidth: '1050px', margin: '0 auto 1.5rem auto' }}>
           <FaCheckCircle /> {successMessage}
         </div>
       )}
@@ -92,10 +187,10 @@ const Apply = () => {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem', maxWidth: '1050px', margin: '0 auto' }}>
         
         {/* Main Application Form */}
-        <form onSubmit={handleSubmit} className="glass-card" style={{ padding: '2.5rem' }}>
+        <form onSubmit={handleSubmit} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '2.5rem', boxShadow: 'var(--shadow-md)' }}>
           
           <div className="form-group">
-            <label htmlFor="scheme">Select Welfare Scheme</label>
+            <label htmlFor="scheme">Select Targeted Welfare Scheme</label>
             <select
               id="scheme"
               className="form-control"
@@ -110,8 +205,25 @@ const Apply = () => {
             </select>
           </div>
 
+          {/* Specific Attributes Display */}
+          {Object.keys(specificDetails).length > 0 && (
+            <div style={{ background: '#fffbeb', padding: '1rem 1.25rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', border: '1px solid #fef08a' }}>
+              <div style={{ fontSize: '0.82rem', color: '#854d0e', marginBottom: '0.5rem', fontWeight: 700 }}>
+                ATTACHED BENEFICIARY DETAILS:
+              </div>
+              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', fontSize: '0.88rem', color: '#334155' }}>
+                {Object.entries(specificDetails).map(([k, v]) => (
+                  <div key={k}>
+                    <span style={{ color: '#64748b', textTransform: 'capitalize' }}>{k.replace(/([A-Z])/g, ' $1')}:</span>{' '}
+                    <strong style={{ color: '#0f172a' }}>{v}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="form-group">
-            <label htmlFor="aadhaar">Aadhaar Number (12 Digits)</label>
+            <label htmlFor="aadhaar"><FaIdCard /> Aadhaar Card Number (12 Digits)</label>
             <input
               type="text"
               id="aadhaar"
@@ -154,12 +266,12 @@ const Apply = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="address">Permanent Address</label>
+            <label htmlFor="address">Permanent Residential Address</label>
             <textarea
               id="address"
               className="form-control"
               rows="3"
-              placeholder="Enter full address as per Aadhaar"
+              placeholder="Enter full address as per Aadhaar Card"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               required
@@ -167,60 +279,67 @@ const Apply = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="docs"><FaUpload /> Supporting Documents Upload</label>
+            <label htmlFor="docs" style={{ color: '#1d4ed8', fontWeight: 700 }}>
+              <FaUpload /> Tailored Supporting Document Package ({beneficiaryType.replace('_', ' ')})
+            </label>
             <select
               id="docs"
               className="form-control"
               value={documentType}
               onChange={(e) => setDocumentType(e.target.value)}
+              style={{ borderColor: '#bfdbfe' }}
             >
-              <option value="Income Certificate & Aadhaar Card">Income Certificate & Aadhaar Card (Verified PDF)</option>
-              <option value="Land Holding & Ration Card">Land Holding & Ration Card (Verified PDF)</option>
-              <option value="Student Marksheet & College ID">Student Marksheet & College ID (Verified PDF)</option>
+              {docOptions.map((doc, idx) => (
+                <option key={idx} value={doc}>
+                  {doc}
+                </option>
+              ))}
             </select>
           </div>
 
-          <button type="submit" className="btn-brand" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem', padding: '0.85rem' }} disabled={isSubmitting}>
-            {isSubmitting ? 'Submitting Application...' : 'Submit Application'} <FaArrowRight />
+          <button type="submit" className="btn-brand" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem', padding: '0.85rem', fontWeight: 700 }} disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting Application...' : `Submit Application as ${beneficiaryType.replace('_', ' ')}`} <FaArrowRight />
           </button>
         </form>
 
-        {/* Live Automated Score Preview Meter (Diagram v1.2) */}
+        {/* Live Automated Score Preview Meter */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div className="glass-card" style={{ padding: '1.75rem', textAlign: 'center' }}>
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '1.75rem', textAlign: 'center', boxShadow: 'var(--shadow-sm)' }}>
             <span className="badge badge-submitted" style={{ marginBottom: '1rem' }}>
               <FaCalculator /> Automated Score Gauge
             </span>
             
             <div style={{ margin: '1.5rem 0', position: 'relative' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, color: estimatedScore >= 60 ? '#34d399' : '#fb7185' }}>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: estimatedScore >= 60 ? '#059669' : '#be123c' }}>
                 {estimatedScore}
               </div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>out of 100</div>
+              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>out of 100</div>
             </div>
 
-            <div style={{ background: 'rgba(15, 23, 42, 0.8)', padding: '1rem', borderRadius: 'var(--radius-md)', textAlign: 'left', fontSize: '0.82rem', color: '#cbd5e1' }}>
+            <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 'var(--radius-md)', textAlign: 'left', fontSize: '0.82rem', color: '#334155', border: '1px solid #e2e8f0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
                 <span>Income Points:</span>
                 <strong>{income <= 150000 ? '30/30' : income <= 300000 ? '20/30' : '10/30'}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
                 <span>Category Points:</span>
-                <strong>40/40</strong>
+                <strong>{category === 'GENERAL' ? '30/40' : '40/40'}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Document Completeness:</span>
-                <strong>30/30</strong>
+                <strong style={{ color: docScoreDisplay === '30/30' ? '#059669' : docScoreDisplay === '15/30' ? '#d97706' : '#be123c' }}>
+                  {docScoreDisplay}
+                </strong>
               </div>
             </div>
 
-            <p style={{ marginTop: '1rem', fontSize: '0.8rem', color: estimatedScore >= 60 ? '#34d399' : '#fb7185' }}>
+            <p style={{ marginTop: '1rem', fontSize: '0.8rem', fontWeight: 600, color: estimatedScore >= 60 ? '#059669' : '#be123c' }}>
               {estimatedScore >= 60 ? '✓ Score meets 60+ threshold! Will pass to Level 1 Field Review.' : '✗ Score below threshold. May be flagged for manual review.'}
             </p>
           </div>
 
-          <div className="glass-card" style={{ padding: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            <h4 style={{ color: '#fff', marginBottom: '0.5rem', fontSize: '0.95rem' }}>3-Stage Verification Pipeline</h4>
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '1.5rem', fontSize: '0.85rem', color: '#475569', boxShadow: 'var(--shadow-sm)' }}>
+            <h4 style={{ color: '#0f172a', marginBottom: '0.5rem', fontSize: '0.95rem' }}>3-Stage Verification Pipeline</h4>
             <ol style={{ paddingLeft: '1.25rem', lineHeight: '1.7' }}>
               <li>Field Officer conducts ground visit & document review.</li>
               <li>District Officer performs secondary scrutiny.</li>

@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface BeneficiaryProfileRepository extends JpaRepository<BeneficiaryProfile, Long> {
     Optional<BeneficiaryProfile> findByUser(User user);
+    Optional<BeneficiaryProfile> findByUserId(Long userId);
 }

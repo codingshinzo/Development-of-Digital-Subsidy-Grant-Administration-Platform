@@ -92,7 +92,7 @@ CREATE TABLE applications (
     beneficiary_id BIGINT NOT NULL,
     scheme_id BIGINT NOT NULL,
     application_date DATE DEFAULT (CURRENT_DATE),
-    status VARCHAR(20),
+    status VARCHAR(50),
     eligibility_score DECIMAL(5, 2),
     current_stage_id BIGINT,
     remarks TEXT,

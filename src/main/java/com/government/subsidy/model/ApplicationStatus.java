@@ -1,12 +1,16 @@
 package com.government.subsidy.model;
 
 public enum ApplicationStatus {
+    DRAFT,
     SUBMITTED,
     FIELD_VERIFIED,
     FIELD_REJECTED,
+    CORRECTION_REQUIRED,
     DISTRICT_VERIFIED,
     DISTRICT_REJECTED,
     APPROVED_FOR_PAYMENT,
+    PAYMENT_PENDING,
     PAYMENT_SUCCESSFUL,
-    PAYMENT_FAILED
+    PAYMENT_FAILED,
+    REJECTED
 }

@@ -2,25 +2,23 @@ import { apiClient } from './apiClient';
 
 export const paymentService = {
     getPayments: async () => {
-        console.log(`[paymentService] Fetching payments`);
         try {
-            return await apiClient.request('/disbursements');
+            return await apiClient.request('/payments');
         } catch (error) {
             console.error('[paymentService] Get payments error:', error);
             return [];
         }
     },
 
-    disbursePayment: async (paymentId) => {
-        console.log(`[paymentService] Disbursing payment ${paymentId}`);
+    disbursePayment: async (applicationId, amount, remarks) => {
         try {
-            return await apiClient.request(`/disbursements/${paymentId}/process`, {
+            return await apiClient.request('/payments/disburse', {
                 method: 'POST',
+                body: JSON.stringify({ applicationId, amount, remarks }),
             });
         } catch (error) {
             console.error('[paymentService] Disburse error:', error);
-            return { success: true, message: "Payment processed" };
+            return { success: false, error: error.message };
         }
     }
 };
-

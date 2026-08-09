@@ -30,6 +30,12 @@ public class WebSecurityConfig {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
+
+    @Autowired
+    private CustomAccessDeniedHandler accessDeniedHandler;
+
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
@@ -58,12 +64,31 @@ public class WebSecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(unauthorizedHandler)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/v1/auth/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/schemes/**", "/api/v1/schemes/**").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/schemes/**", "/api/v1/schemes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/schemes/**", "/api/v1/schemes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/schemes/**", "/api/v1/schemes/**").hasRole("ADMIN")
+                        .requestMatchers("/api/beneficiaries/**", "/api/v1/beneficiaries/**").hasAnyRole("CITIZEN", "ADMIN")
+                        .requestMatchers("/api/applications/**", "/api/v1/applications/**").hasAnyRole("CITIZEN", "FIELD_OFFICER", "DISTRICT_OFFICER", "FINANCE_OFFICER", "ADMIN")
+                        .requestMatchers("/api/workflow/field/**", "/api/v1/workflow/field/**").hasAnyRole("FIELD_OFFICER", "ADMIN")
+                        .requestMatchers("/api/workflow/district/**", "/api/v1/workflow/district/**").hasAnyRole("DISTRICT_OFFICER", "ADMIN")
+                        .requestMatchers("/api/workflow/finance/**", "/api/v1/workflow/finance/**").hasAnyRole("FINANCE_OFFICER", "ADMIN")
+                        .requestMatchers("/api/workflow/**", "/api/v1/workflow/**").hasAnyRole("FIELD_OFFICER", "DISTRICT_OFFICER", "FINANCE_OFFICER", "ADMIN")
+                        .requestMatchers("/api/payments/**", "/api/v1/payments/**").hasAnyRole("FINANCE_OFFICER", "ADMIN")
+                        .requestMatchers("/api/disbursements/**", "/api/v1/disbursements/**").hasAnyRole("FINANCE_OFFICER", "ADMIN")
+                        .requestMatchers("/api/dashboard/**", "/api/v1/dashboard/**").hasAnyRole("ADMIN", "FINANCE_OFFICER", "DISTRICT_OFFICER", "FIELD_OFFICER", "CITIZEN")
+                        .requestMatchers("/api/reports/**", "/api/v1/reports/**").hasAnyRole("ADMIN", "FINANCE_OFFICER")
+                        .anyRequest().authenticated()
                 );
 
         http.authenticationProvider(authenticationProvider());

@@ -12,6 +12,8 @@ public class Scheme {
     @Column(nullable = false)
     private String name;
 
+    private String category;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -21,17 +23,28 @@ public class Scheme {
     private Double budget;
 
     @Column(nullable = false)
+    private Double budgetUsed = 0.0;
+
+    private String district;
+
+    @Column(nullable = false)
     private boolean active = true;
 
     public Scheme() {}
 
-    public Scheme(Long id, String name, String description, String eligibilityCriteria, Double budget, boolean active) {
+    public Scheme(Long id, String name, String category, String description, String eligibilityCriteria, Double budget, boolean active) {
         this.id = id;
         this.name = name;
+        this.category = category != null ? category : "General";
         this.description = description;
         this.eligibilityCriteria = eligibilityCriteria;
         this.budget = budget;
+        this.budgetUsed = 0.0;
         this.active = active;
+    }
+
+    public Scheme(Long id, String name, String description, String eligibilityCriteria, Double budget, boolean active) {
+        this(id, name, "General", description, eligibilityCriteria, budget, active);
     }
 
     public Long getId() { return id; }
@@ -39,6 +52,9 @@ public class Scheme {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getCategory() { return category != null ? category : "General"; }
+    public void setCategory(String category) { this.category = category; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
@@ -48,6 +64,12 @@ public class Scheme {
 
     public Double getBudget() { return budget; }
     public void setBudget(Double budget) { this.budget = budget; }
+
+    public Double getBudgetUsed() { return budgetUsed != null ? budgetUsed : 0.0; }
+    public void setBudgetUsed(Double budgetUsed) { this.budgetUsed = budgetUsed; }
+
+    public String getDistrict() { return district; }
+    public void setDistrict(String district) { this.district = district; }
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }

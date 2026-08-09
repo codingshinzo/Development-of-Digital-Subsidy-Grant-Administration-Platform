@@ -1,73 +1,83 @@
-# Government Subsidy & Grant Disbursement Tracking System - Backend
+# Government Subsidy & Grant Disbursement Tracking System
 
-This is the Spring Boot backend for the Government Subsidy & Grant Disbursement Tracking System. It provides RESTful APIs for managing users, schemes, beneficiary profiles, applications, and multi-level approval workflows.
+## 📁 Organized Project Structure
 
-## Technologies Used
-- **Java 17**
-- **Spring Boot 3.x** (Web, Data JPA, Security, Validation)
-- **MySQL** (Relational Database)
-- **JSON Web Tokens (JWT)** (Stateless Authentication)
-- **Lombok** (Reduces boilerplate code)
+The codebase is organized into clear **Frontend**, **Backend**, and **Docs** directories for easy navigation in File Explorer & IDEs:
 
-## Modules Implemented
-Based on the research and development report, the following core modules have been generated:
+```
+Government-Subsidy-Tracking-System/
+├── 📁 frontend/                               # React 18 + Vite Web Application
+│   ├── 📁 public/                             # Public assets (favicon.svg emblem)
+│   ├── 📁 src/                                # Frontend Source Code
+│   │   ├── 📁 components/                     # Reusable UI Components (Sidebar, Navbar, Footer)
+│   │   ├── 📁 pages/                          # Application Pages & Dashboards
+│   │   │   ├── Login.jsx                      # Dual Citizen / Officer Portal Sign In
+│   │   │   ├── Register.jsx                   # Account Registration
+│   │   │   ├── Apply.jsx                      # Scheme Application Form & Score Gauge
+│   │   │   ├── TrackStatus.jsx                # Step-by-Step Application Tracker
+│   │   │   ├── FieldOfficerDashboard.jsx      # Level 1 Ground Check Queue
+│   │   │   ├── DistrictOfficerDashboard.jsx   # Level 2 Scrutiny Queue
+│   │   │   ├── FinanceOfficerDashboard.jsx    # Level 3 Disbursement Queue
+│   │   │   ├── AdminDashboard.jsx             # System Control Panel & Scheme Controls
+│   │   │   └── UtilizationReport.jsx          # Real Database Analytics & Export Reports
+│   │   ├── 📁 services/                       # API Services (apiClient, authService, applicationService)
+│   │   ├── 📁 layouts/                        # Dashboard Page Layouts
+│   │   └── 📁 styles/                         # CSS Stylesheets
+│   ├── index.html                             # Web Page Entrypoint
+│   ├── package.json                           # React Frontend Dependencies
+│   └── vite.config.js                         # Vite Build Configuration
+│
+├── 📁 backend/                                # Java Spring Boot REST API Service
+│   ├── 📁 src/main/java/com/government/subsidy/
+│   │   ├── 📁 config/                         # DataInitializer (Predefined Demo Accounts)
+│   │   ├── 📁 controller/                     # REST API Controllers (Auth, Workflow, Application, Scheme)
+│   │   ├── 📁 dto/                            # Data Transfer Objects (Login, Signup, Workflow)
+│   │   ├── 📁 model/                          # Database Entities (User, Application, Scheme, DisbursementPlan)
+│   │   ├── 📁 repository/                     # Spring Data JPA Repositories
+│   │   ├── 📁 security/                       # WebSecurityConfig, JwtUtils, AuthTokenFilter
+│   │   └── 📁 service/                        # Business Logic Services (ApplicationService, WorkflowService)
+│   ├── 📁 src/main/resources/                 # application.properties (Database & JWT Secret)
+│   ├── 📁 src/test/                           # Automated Integration Tests (18 Unit/Integration Tests)
+│   ├── pom.xml                                # Maven Dependencies & Build Manifest
+│   ├── mvnw & mvnw.cmd                        # Maven Wrapper Executables
+│   └── schema.sql                             # SQL DDL Database Schema
+│
+└── 📁 docs/                                   # Documentation & Architecture
+    ├── Government_Subsidy_Tracking_System_Architecture_and_Build.pptx  # 15-Slide Architecture Presentation
+    ├── schema.sql                             # Relational Database Schema
+    ├── PROJECT_ANALYSIS.md                    # Initial Codebase Inspection Audit
+    └── CHANGES_MADE.md                        # Complete Change Log Documentation
+```
 
-1. **Authentication Module:** Secure login and registration using JWT. Implements Role-Based Access Control (RBAC) with roles: `CITIZEN`, `FIELD_OFFICER`, `DISTRICT_OFFICER`, `FINANCE_OFFICER`, and `ADMIN`.
-2. **Scheme Management Module:** CRUD operations for government subsidy schemes.
-3. **Beneficiary Module:** Management of citizen profiles, linking Aadhaar and bank details.
-4. **Application Module:** Endpoints for citizens to submit applications for specific schemes.
-5. **Approval Workflow Module:** Multi-level state machine for application status transitions (e.g., `SUBMITTED` -> `FIELD_VERIFIED` -> `APPROVED_FOR_PAYMENT`).
-6. **Payment & Audit Modules:** Entities to track successful disbursements and log system activities.
+---
 
-## Prerequisites
-Before running this application, ensure you have the following installed on your machine:
-- **Java Development Kit (JDK) 17** or higher. *(Note: A JRE is not sufficient for compilation)*.
-- **Maven** (optional, as the project includes a Maven wrapper `mvnw`).
-- **MySQL Server**.
+## 🚀 Running the Project
 
-## Database Setup
-1. Open your MySQL client (e.g., MySQL Workbench, phpMyAdmin, or CLI).
-2. Create an empty database named `subsidy_db`:
-   ```sql
-   CREATE DATABASE subsidy_db;
-   ```
-3. The application is configured to connect using the default username `root` with no password on `localhost:3306`. If your MySQL credentials differ, update them in `src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.username=YOUR_USERNAME
-   spring.datasource.password=YOUR_PASSWORD
-   ```
+### 1. Launch Backend (Java Spring Boot)
+Navigating to the `backend` folder:
+```bash
+cd backend
+.\mvnw.cmd spring-boot:run
+```
+*The REST API server will start on `http://localhost:8080`.*
 
-## How to Run
-1. Open a terminal or command prompt and navigate to this `backend` directory.
-2. Compile and run the application using the Maven wrapper:
-   
-   **On Windows:**
-   ```bash
-   .\mvnw.cmd spring-boot:run
-   ```
-   **On Mac/Linux:**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-3. The server will start on port `8080`.
+### 2. Launch Frontend (React + Vite)
+Navigating to the `frontend` folder:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*The web interface will start on `http://localhost:5173`.*
 
-## API Endpoints Overview
-*Note: Most endpoints require a valid JWT `Authorization: Bearer <token>` header.*
+---
 
-**Auth (`/api/auth`)**
-- `POST /login` - Authenticate a user and receive a JWT.
-- `POST /signup` - Register a new user.
+## 🔑 Predefined Demo Login Credentials
 
-**Schemes (`/api/schemes`)**
-- `GET /` - List all active schemes.
-- `POST /` - Create a new scheme (Requires `ADMIN` role).
-- `PUT /{id}` - Update a scheme (Requires `ADMIN` role).
-
-**Beneficiaries (`/api/beneficiaries`)**
-- `POST /{userId}` - Create a beneficiary profile for a citizen.
-- `GET /{userId}` - Retrieve a beneficiary profile.
-
-**Applications (`/api/applications`)**
-- `POST /` - Submit a new application (Requires `CITIZEN` role).
-- `GET /` - List all applications (For Officers/Admins).
-- `PUT /{id}/status` - Update the status of an application (For Officers).
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **System Administrator** | `admin@gov.in` | `Password@123` |
+| **Field Officer (Level 1)** | `field.officer@gov.in` | `Password@123` |
+| **District Officer (Level 2)** | `district.officer@gov.in` | `Password@123` |
+| **Finance Officer (Level 3)** | `finance.officer@gov.in` | `Password@123` |
+| **Citizen Beneficiary** | `citizen@gov.in` | `Password@123` |

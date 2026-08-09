@@ -19,7 +19,7 @@ public class Application {
     private BeneficiaryProfile beneficiary;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private ApplicationStatus status = ApplicationStatus.SUBMITTED;
 
     private LocalDateTime submittedDate = LocalDateTime.now();

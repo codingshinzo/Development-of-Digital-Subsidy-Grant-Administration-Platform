@@ -1,15 +1,15 @@
 .navbar {
-  background-color: var(--primary-color);
-  color: white;
+  background-color: #ffffff;
+  color: #0f172a;
   padding: 1rem 0;
-  box-shadow: var(--box-shadow);
+  border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
 .navbar-container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 1.5rem;
   display: flex;
@@ -21,19 +21,19 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  color: white;
+  color: #0f172a;
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: 700;
 }
 
 .navbar-logo:hover {
-  color: var(--secondary-color);
+  color: #38bdf8;
 }
 
 .navbar-icon {
   font-size: 1.8rem;
-  color: var(--secondary-color);
+  color: #38bdf8;
 }
 
 .navbar-links {
@@ -43,8 +43,8 @@
 }
 
 .nav-link {
-  color: white;
-  font-weight: 500;
+  color: #334155;
+  font-weight: 600;
   position: relative;
 }
 
@@ -55,12 +55,12 @@
   height: 2px;
   bottom: -4px;
   left: 0;
-  background-color: var(--secondary-color);
-  transition: width var(--transition-speed) ease;
+  background-color: #38bdf8;
+  transition: width 0.2s ease;
 }
 
 .nav-link:hover {
-  color: white;
+  color: #0284c7;
 }
 
 .nav-link:hover::after {
@@ -72,17 +72,8 @@
   gap: 1rem;
 }
 
-.nav-auth .btn-secondary {
-  color: white;
-  border-color: white;
-}
-
-.nav-auth .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
 @media (max-width: 768px) {
   .navbar-links {
-    display: none; /* simple responsive fix for now */
+    display: none;
   }
 }

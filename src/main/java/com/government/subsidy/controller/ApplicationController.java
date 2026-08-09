@@ -1,15 +1,17 @@
 package com.government.subsidy.controller;
 
+import com.government.subsidy.dto.WorkflowActionRequest;
 import com.government.subsidy.model.Application;
 import com.government.subsidy.model.ApplicationStatus;
-import com.government.subsidy.model.Scheme;
-import com.government.subsidy.repository.ApplicationRepository;
-import com.government.subsidy.repository.SchemeRepository;
+import com.government.subsidy.model.Role;
+import com.government.subsidy.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,109 +21,88 @@ import java.util.Map;
 public class ApplicationController {
 
     @Autowired
-    private ApplicationRepository applicationRepository;
-
-    @Autowired
-    private SchemeRepository schemeRepository;
+    private ApplicationService applicationService;
 
     @GetMapping
     public List<Application> getAllApplications() {
-        return applicationRepository.findAll();
+        return applicationService.getAllApplications();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Application> getApplicationById(@PathVariable Long id) {
-        return applicationRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(applicationService.getApplicationById(id));
+    }
+
+    @GetMapping("/my-applications")
+    public ResponseEntity<List<Application>> getMyApplications() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) ? auth.getName() : "citizen@gov.in";
+        return ResponseEntity.ok(applicationService.getApplicationsForCitizen(userEmail));
     }
 
     @GetMapping("/{id}/status")
     public ResponseEntity<Map<String, Object>> getApplicationStatus(@PathVariable Long id) {
-        return applicationRepository.findById(id).map(app -> {
-            Map<String, Object> statusMap = new HashMap<>();
-            statusMap.put("id", app.getId());
-            statusMap.put("status", app.getStatus());
-            statusMap.put("eligibilityScore", app.getEligibilityScore());
-            statusMap.put("submittedDate", app.getSubmittedDate());
-            statusMap.put("remarks", app.getRemarks());
-            return ResponseEntity.ok(statusMap);
-        }).orElse(ResponseEntity.notFound().build());
+        Application app = applicationService.getApplicationById(id);
+        Map<String, Object> statusMap = new HashMap<>();
+        statusMap.put("id", app.getId());
+        statusMap.put("status", app.getStatus());
+        statusMap.put("eligibilityScore", app.getEligibilityScore());
+        statusMap.put("submittedDate", app.getSubmittedDate());
+        statusMap.put("remarks", app.getRemarks());
+        return ResponseEntity.ok(statusMap);
     }
 
     @PostMapping
     public ResponseEntity<?> submitApplication(@RequestBody Map<String, Object> payload) {
         try {
-            Long schemeId = Long.parseLong(payload.getOrDefault("schemeId", "1").toString());
-            Scheme scheme = schemeRepository.findById(schemeId).orElse(null);
-            if (scheme == null) {
-                List<Scheme> allSchemes = schemeRepository.findAll();
-                if (!allSchemes.isEmpty()) scheme = allSchemes.get(0);
-            }
-
-            Application application = new Application();
-            application.setScheme(scheme);
-            application.setSubmittedDate(LocalDateTime.now());
-
-            int incomeScore = 30; 
-            int categoryScore = 40;
-            int documentScore = 30;
-
-            if (payload.containsKey("income")) {
-                double income = Double.parseDouble(payload.get("income").toString());
-                if (income > 300000) incomeScore = 10;
-                else if (income > 150000) incomeScore = 20;
-            }
-
-            int totalScore = incomeScore + categoryScore + documentScore;
-            application.setEligibilityScore(totalScore);
-
-            if (totalScore >= 60) {
-                application.setStatus(ApplicationStatus.SUBMITTED);
-                application.setRemarks("Auto-eligibility score: " + totalScore + "/100. Assigned to Level 1: Field Officer Review.");
-            } else {
-                application.setStatus(ApplicationStatus.FIELD_REJECTED);
-                application.setRemarks("Auto-flagged/Rejected. Score: " + totalScore + "/100 below minimum threshold of 60.");
-            }
-
-            Application saved = applicationRepository.save(application);
-            return ResponseEntity.ok(saved);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) ? auth.getName() : null;
+            
+            Application application = applicationService.submitApplication(payload, userEmail);
+            return ResponseEntity.status(HttpStatus.CREATED).body(application);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("status", "error", "message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
         }
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<Application> updateApplicationStatus(
+    public ResponseEntity<?> updateApplicationStatus(
             @PathVariable Long id,
-            @RequestParam(required = false) ApplicationStatus status,
             @RequestBody(required = false) Map<String, Object> body) {
 
-        ApplicationStatus targetStatus = status;
-        String remarks = null;
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String officerEmail = (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) ? auth.getName() : "officer@gov.in";
 
-        if (body != null) {
-            if (body.containsKey("status")) {
-                try {
-                    targetStatus = ApplicationStatus.valueOf(body.get("status").toString().toUpperCase());
-                } catch (Exception ignored) {}
+            String actionStr = "APPROVE";
+            String remarks = null;
+            String targetStatus = null;
+
+            if (body != null) {
+                if (body.containsKey("status")) {
+                    targetStatus = body.get("status").toString();
+                    if (targetStatus.contains("REJECT")) actionStr = "REJECT";
+                    else if (targetStatus.contains("CORRECTION")) actionStr = "REQUEST_CORRECTION";
+                }
+                if (body.containsKey("remarks")) {
+                    remarks = body.get("remarks").toString();
+                }
+                if (body.containsKey("action")) {
+                    actionStr = body.get("action").toString();
+                }
             }
-            if (body.containsKey("remarks")) {
-                remarks = body.get("remarks").toString();
-            }
+
+            WorkflowActionRequest req = new WorkflowActionRequest(actionStr, remarks, targetStatus);
+            Application updated = applicationService.processWorkflowAction(id, req, officerEmail, Role.FIELD_OFFICER);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("status", "error", "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("status", "error", "message", e.getMessage()));
         }
-
-        final ApplicationStatus finalStatus = targetStatus;
-        final String finalRemarks = remarks;
-
-        return applicationRepository.findById(id).map(app -> {
-            if (finalStatus != null) {
-                app.setStatus(finalStatus);
-            }
-            if (finalRemarks != null) {
-                app.setRemarks(finalRemarks);
-            }
-            return ResponseEntity.ok(applicationRepository.save(app));
-        }).orElse(ResponseEntity.notFound().build());
     }
 }

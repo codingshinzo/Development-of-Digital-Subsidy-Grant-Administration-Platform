@@ -50,6 +50,16 @@ public class SchemeController {
         }
     }
 
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Scheme> activateScheme(@PathVariable Long id) {
+        return ResponseEntity.ok(schemeService.activateScheme(id));
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<Scheme> deactivateScheme(@PathVariable Long id) {
+        return ResponseEntity.ok(schemeService.deactivateScheme(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteScheme(@PathVariable Long id) {
         schemeService.deleteScheme(id);

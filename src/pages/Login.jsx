@@ -1,34 +1,55 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaEnvelope, FaLock, FaUserShield, FaSignInAlt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { 
+  FaEnvelope, FaLock, FaUserShield, FaSignInAlt, FaUserCheck,
+  FaTractor, FaGraduationCap, FaHeartbeat, FaStore, FaTools, FaIdBadge,
+  FaEye, FaEyeSlash
+} from 'react-icons/fa';
 import { authService } from '../services/authService';
 
 const Login = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const queryParams = new URLSearchParams(location.search);
+  const isOfficerPortal = location.pathname.includes('officer') || queryParams.get('type') === 'officer' || queryParams.get('type') === 'admin';
+  const mainPortal = isOfficerPortal ? 'ADMIN' : 'USER';
+
+  const [selectedUserType, setSelectedUserType] = useState('FARMER');
+  const [selectedOfficerRole, setSelectedOfficerRole] = useState('FIELD_OFFICER');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('CITIZEN');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    setErrorMessage('');
+  }, [location.pathname, location.search]);
 
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
     setErrorMessage('');
 
     if (!email || !password) {
-      setErrorMessage('Please enter email/phone and password.');
+      setErrorMessage('Please enter your email/ID and password.');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await authService.login(email, password, role);
+      const roleToSubmit = mainPortal === 'USER' ? 'CITIZEN' : selectedOfficerRole;
+      
+      if (mainPortal === 'USER') {
+        localStorage.setItem('beneficiaryType', selectedUserType);
+      }
 
-      if (response.success && response.token) {
+      const response = await authService.login(email, password, roleToSubmit);
 
-        const userRole = response.role || role;
+      if (response.success) {
+        const userRole = response.role || roleToSubmit;
         let dashboardPath = '/dashboard';
         if (userRole === 'FIELD_OFFICER' || userRole === 'Field Officer') dashboardPath = '/field-officer';
         else if (userRole === 'DISTRICT_OFFICER' || userRole === 'District Officer') dashboardPath = '/district-officer';
@@ -37,81 +58,268 @@ const Login = () => {
 
         navigate(dashboardPath);
       } else {
-        setErrorMessage(response.error || 'Invalid credentials or login failed.');
+        setErrorMessage(response.error || 'Invalid credentials or authentication failed.');
       }
     } catch (error) {
-      setErrorMessage(error.message || 'Login error connecting to backend server.');
+      setErrorMessage(error.message || 'Login error connecting to server.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="animate-fade-in" style={{ padding: '3rem 1rem' }}>
-      <div className="glass-card" style={{ maxWidth: '480px', margin: '0 auto', padding: '2.5rem' }}>
+    <div className="animate-fade-in" style={{ padding: '2.5rem 1rem', background: '#ffffff', minHeight: '80vh' }}>
+      <div style={{ maxWidth: '540px', margin: '0 auto' }}>
         
+        {/* Top Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.8rem', color: '#fff' }}>Portal Authentication</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sign in to access your direct benefit transfer portal</p>
+          {mainPortal === 'USER' ? (
+            <>
+              <span className="badge badge-submitted" style={{ marginBottom: '0.75rem', background: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd' }}>
+                <FaUserCheck /> Beneficiary Access Portal
+              </span>
+              <h2 style={{ fontSize: '2.2rem', color: '#0f172a', fontWeight: 800, marginBottom: '0.5rem' }}>
+                Citizen Beneficiary Sign In
+              </h2>
+              <p style={{ color: '#475569', fontSize: '0.95rem' }}>
+                Sign in to apply for schemes, track verification progress & check grant disbursements.
+              </p>
+            </>
+          ) : (
+            <>
+              <span className="badge badge-approved" style={{ marginBottom: '0.75rem', background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0' }}>
+                <FaUserShield /> Government Officer Portal
+              </span>
+              <h2 style={{ fontSize: '2.2rem', color: '#0f172a', fontWeight: 800, marginBottom: '0.5rem' }}>
+                Officer & Admin Sign In
+              </h2>
+              <p style={{ color: '#475569', fontSize: '0.95rem' }}>
+                Official login for Field Officers, District Officers, Finance Officers & Administrators.
+              </p>
+            </>
+          )}
         </div>
 
-        {errorMessage && (
-          <div style={{ background: 'rgba(244, 63, 94, 0.15)', border: '1px solid #f43f5e', color: '#fb7185', padding: '0.85rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
-            {errorMessage}
-          </div>
-        )}
+        {/* Form Card Surface */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: 'var(--radius-xl)',
+          padding: '2.5rem',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.04)'
+        }}>
 
-        <form onSubmit={handleLoginSubmit}>
-          
-          <div className="form-group">
-            <label htmlFor="email"><FaEnvelope /> Email / Mobile Phone</label>
-            <input
-              type="text"
-              id="email"
-              className="form-control"
-              placeholder="Enter email address or mobile"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+          {errorMessage && (
+            <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', color: '#be123c', padding: '0.85rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem', fontWeight: 600 }}>
+              {errorMessage}
+            </div>
+          )}
 
-          <div className="form-group">
-            <label htmlFor="password"><FaLock /> Password</label>
-            <input
-              type="password"
-              id="password"
-              className="form-control"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <form onSubmit={handleLoginSubmit}>
 
-          <div className="form-group">
-            <label htmlFor="role"><FaUserShield /> Sign In As</label>
-            <select
-              id="role"
-              className="form-control"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
+            {/* BENEFICIARY SPECIFIC CATEGORY SELECTION */}
+            {mainPortal === 'USER' && (
+              <div style={{ marginBottom: '1.75rem', background: '#f0f9ff', padding: '1.25rem', borderRadius: 'var(--radius-lg)', border: '1px solid #bae6fd' }}>
+                <label style={{ display: 'block', fontSize: '0.92rem', fontWeight: 700, color: '#0369a1', marginBottom: '0.75rem' }}>
+                  Select Beneficiary Category:
+                </label>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: '0.5rem' }}>
+                  
+                  <div 
+                    onClick={() => setSelectedUserType('FARMER')}
+                    style={{
+                      padding: '0.75rem 0.5rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: selectedUserType === 'FARMER' ? '2px solid #38bdf8' : '1px solid #e2e8f0',
+                      background: selectedUserType === 'FARMER' ? '#e0f2fe' : '#ffffff',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: selectedUserType === 'FARMER' ? '0 2px 8px rgba(56, 189, 248, 0.2)' : 'none'
+                    }}
+                  >
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: selectedUserType === 'FARMER' ? '#0369a1' : '#334155' }}>Farmer</div>
+                  </div>
+
+                  <div 
+                    onClick={() => setSelectedUserType('STUDENT')}
+                    style={{
+                      padding: '0.75rem 0.5rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: selectedUserType === 'STUDENT' ? '2px solid #38bdf8' : '1px solid #e2e8f0',
+                      background: selectedUserType === 'STUDENT' ? '#e0f2fe' : '#ffffff',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: selectedUserType === 'STUDENT' ? '0 2px 8px rgba(56, 189, 248, 0.2)' : 'none'
+                    }}
+                  >
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: selectedUserType === 'STUDENT' ? '#0369a1' : '#334155' }}>Student</div>
+                  </div>
+
+                  <div 
+                    onClick={() => setSelectedUserType('SENIOR_CITIZEN')}
+                    style={{
+                      padding: '0.75rem 0.5rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: selectedUserType === 'SENIOR_CITIZEN' ? '2px solid #38bdf8' : '1px solid #e2e8f0',
+                      background: selectedUserType === 'SENIOR_CITIZEN' ? '#e0f2fe' : '#ffffff',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: selectedUserType === 'SENIOR_CITIZEN' ? '0 2px 8px rgba(56, 189, 248, 0.2)' : 'none'
+                    }}
+                  >
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: selectedUserType === 'SENIOR_CITIZEN' ? '#0369a1' : '#334155' }}>Senior</div>
+                  </div>
+
+                  <div 
+                    onClick={() => setSelectedUserType('ENTREPRENEUR')}
+                    style={{
+                      padding: '0.75rem 0.5rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: selectedUserType === 'ENTREPRENEUR' ? '2px solid #38bdf8' : '1px solid #e2e8f0',
+                      background: selectedUserType === 'ENTREPRENEUR' ? '#e0f2fe' : '#ffffff',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: selectedUserType === 'ENTREPRENEUR' ? '0 2px 8px rgba(56, 189, 248, 0.2)' : 'none'
+                    }}
+                  >
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: selectedUserType === 'ENTREPRENEUR' ? '#0369a1' : '#334155' }}>Business</div>
+                  </div>
+
+                  <div 
+                    onClick={() => setSelectedUserType('WORKER')}
+                    style={{
+                      padding: '0.75rem 0.5rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: selectedUserType === 'WORKER' ? '2px solid #38bdf8' : '1px solid #e2e8f0',
+                      background: selectedUserType === 'WORKER' ? '#e0f2fe' : '#ffffff',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: selectedUserType === 'WORKER' ? '0 2px 8px rgba(56, 189, 248, 0.2)' : 'none'
+                    }}
+                  >
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: selectedUserType === 'WORKER' ? '#0369a1' : '#334155' }}>Worker</div>
+                  </div>
+
+                </div>
+              </div>
+            )}
+
+            {/* OFFICER / ADMIN DESIGNATION SELECTION */}
+            {mainPortal === 'ADMIN' && (
+              <div style={{ marginBottom: '1.75rem', background: '#f0fdf4', padding: '1.25rem', borderRadius: 'var(--radius-lg)', border: '1px solid #bbf7d0' }}>
+                <label style={{ display: 'block', fontSize: '0.92rem', fontWeight: 700, color: '#15803d', marginBottom: '0.75rem' }}>
+                  <FaIdBadge /> Select Government Officer Designation:
+                </label>
+
+                <select
+                  className="form-control"
+                  value={selectedOfficerRole}
+                  onChange={(e) => setSelectedOfficerRole(e.target.value)}
+                  style={{ fontWeight: 600, borderColor: '#4ade80' }}
+                >
+                  <option value="FIELD_OFFICER">Field Officer</option>
+                  <option value="DISTRICT_OFFICER">District Officer</option>
+                  <option value="FINANCE_OFFICER">Finance Officer</option>
+                  <option value="ADMIN">System Administrator</option>
+                </select>
+              </div>
+            )}
+
+            {/* CREDENTIAL FIELDS */}
+            <div className="form-group">
+              <label htmlFor="email" style={{ color: '#1e293b' }}>
+                <FaEnvelope /> {mainPortal === 'USER' ? 'Email Address / Registered Phone' : 'Official Email ID / Employee Code'}
+              </label>
+              <input
+                type="text"
+                id="email"
+                className="form-control"
+                placeholder={mainPortal === 'USER' ? 'Enter email or 10-digit phone' : 'officer@gov.in or EMP-ID'}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" style={{ color: '#1e293b' }}><FaLock /> Password</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  className="form-control"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{ paddingRight: '2.5rem' }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '0.85rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#64748b',
+                    cursor: 'pointer',
+                    fontSize: '1.1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0.25rem',
+                    borderRadius: '4px',
+                    outline: 'none'
+                  }}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-brand"
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                marginTop: '1.5rem',
+                padding: '0.85rem',
+                fontSize: '1rem',
+                fontWeight: 700,
+                background: mainPortal === 'USER' ? 'linear-gradient(135deg, #38bdf8 0%, #60a5fa 100%)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#ffffff'
+              }}
+              disabled={isLoading}
             >
-              <option value="CITIZEN">Citizen / Beneficiary</option>
-              <option value="FIELD_OFFICER">Field Officer (Level 1)</option>
-              <option value="DISTRICT_OFFICER">District Officer (Level 2)</option>
-              <option value="FINANCE_OFFICER">Finance Officer (Level 3)</option>
-              <option value="ADMIN">System Administrator</option>
-            </select>
+              <FaSignInAlt /> {isLoading ? 'Authenticating...' : mainPortal === 'USER' ? `Sign In as ${selectedUserType.replace('_', ' ')}` : `Sign In as ${selectedOfficerRole.replace('_', ' ')}`}
+            </button>
+
+          </form>
+
+          {/* Dedicated Registration Footer */}
+          <div style={{ textAlign: 'center', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid #e2e8f0', fontSize: '0.9rem', color: '#64748b' }}>
+            {mainPortal === 'USER' ? (
+              <>
+                New beneficiary?{' '}
+                <Link to="/register?type=user" style={{ color: '#0284c7', fontWeight: 700 }}>
+                  Register as Beneficiary
+                </Link>
+              </>
+            ) : (
+              <>
+                New officer account?{' '}
+                <Link to="/register?type=admin" style={{ color: '#059669', fontWeight: 700 }}>
+                  Register as Government Officer
+                </Link>
+              </>
+            )}
           </div>
 
-          <button type="submit" className="btn-brand" style={{ width: '100%', justifyContent: 'center', marginTop: '1.5rem', padding: '0.85rem' }} disabled={isLoading}>
-            <FaSignInAlt /> {isLoading ? 'Authenticating with DB...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-          Don't have an account? <Link to="/register" style={{ color: 'var(--accent-blue)', fontWeight: 600 }}>Register here</Link>
         </div>
 
       </div>

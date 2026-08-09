@@ -1,8 +1,8 @@
-const BASE_URL = 'http://localhost:8080/api/v1';
+const BASE_URL = 'http://localhost:8080';
 
 export const apiClient = {
     async request(endpoint, options = {}) {
-        const token = localStorage.getItem('jwtToken');
+        const token = localStorage.getItem('jwtToken') || localStorage.getItem('token');
         const headers = {
             'Content-Type': 'application/json',
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -14,7 +14,8 @@ export const apiClient = {
             headers,
         };
 
-        const response = await fetch(`${BASE_URL}${endpoint}`, config);
+        const url = endpoint.startsWith('/api') ? `${BASE_URL}${endpoint}` : `${BASE_URL}/api/v1${endpoint}`;
+        const response = await fetch(url, config);
 
         if (!response.ok) {
             let errorMessage = 'An error occurred on the server';

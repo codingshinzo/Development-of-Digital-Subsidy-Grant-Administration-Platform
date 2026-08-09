@@ -1,38 +1,91 @@
 import React, { useState, useEffect } from 'react';
-import { FaChartBar, FaMoneyBillWave, FaLandmark, FaCheckCircle, FaChartPie } from 'react-icons/fa';
-import { applicationService } from '../services/applicationService';
-import { paymentService } from '../services/paymentService';
+import { FaMoneyBillWave, FaCheckCircle, FaChartPie, FaDownload, FaFilePdf } from 'react-icons/fa';
+import { apiClient } from '../services/apiClient';
 
 const UtilizationReport = () => {
-  const [apps, setApps] = useState([]);
-  const [payments, setPayments] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [schemesData, setSchemesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
+    fetchDashboardData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchDashboardData = async () => {
+    setIsLoading(true);
     try {
-      const a = await applicationService.getApplications();
-      setApps(a || []);
-      const p = await paymentService.getPayments();
-      setPayments(p || []);
+      const [sData, schData] = await Promise.all([
+        apiClient.request('/api/dashboard/stats').catch(() => null),
+        apiClient.request('/api/dashboard/schemes').catch(() => [])
+      ]);
+
+      setStats(sData);
+      setSchemesData(schData || []);
     } catch (e) {
-      console.error(e);
+      console.error('Error loading utilization analytics:', e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const totalDisbursed = apps.filter(a => a.status === 'PAYMENT_SUCCESSFUL').length * 250000;
+  const handleDownloadExcel = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken') || localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/api/dashboard/reports/excel', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'subsidy_schemes_report.csv';
+      a.click();
+    } catch (err) {
+      alert('Failed to download Excel report: ' + err.message);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken') || localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/api/dashboard/reports/pdf', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'subsidy_schemes_report.pdf';
+      a.click();
+    } catch (err) {
+      alert('Failed to download PDF report: ' + err.message);
+    }
+  };
+
+  const totalDisbursed = stats?.totalDisbursedAmount || 0;
+  const approvedGrantsCount = stats?.totalApprovedGrants || 0;
 
   return (
-    <div className="animate-fade-in" style={{ padding: '1rem 0' }}>
+    <div className="animate-fade-in" style={{ padding: '1rem 0', background: '#ffffff', minHeight: '80vh' }}>
       
-      <div className="glass-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
-        <span className="badge badge-submitted" style={{ marginBottom: '0.5rem' }}>Analytics & Transparency</span>
-        <h2 style={{ fontSize: '1.75rem', color: '#fff' }}>Fund Utilization & Disbursement Analytics</h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Real-time transparency reports on scheme budget utilization and district distribution.</p>
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '2rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', boxShadow: 'var(--shadow-sm)' }}>
+        <div>
+          <span className="badge badge-submitted" style={{ marginBottom: '0.5rem' }}>Analytics & Transparency</span>
+          <h2 style={{ fontSize: '1.75rem', color: '#0f172a', fontWeight: 800 }}>Fund Utilization & Disbursement Analytics</h2>
+          <p style={{ color: '#475569', fontSize: '0.9rem' }}>Real-time database analytics on scheme budget utilization and district distribution.</p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button onClick={handleDownloadExcel} className="btn-outline" style={{ padding: '0.65rem 1.1rem', fontSize: '0.85rem' }}>
+            <FaDownload /> Export CSV / Excel
+          </button>
+          <button onClick={handleDownloadPdf} className="btn-brand" style={{ padding: '0.65rem 1.1rem', fontSize: '0.85rem' }}>
+            <FaFilePdf /> Export PDF Report
+          </button>
+        </div>
       </div>
 
+      {/* Metrics Grid */}
       <div className="stats-grid" style={{ marginBottom: '2.5rem' }}>
         <div className="stat-card">
           <div className="stat-icon emerald"><FaMoneyBillWave /></div>
@@ -45,55 +98,65 @@ const UtilizationReport = () => {
         <div className="stat-card">
           <div className="stat-icon blue"><FaCheckCircle /></div>
           <div className="stat-info">
-            <h4>{apps.filter(a => a.status === 'PAYMENT_SUCCESSFUL').length}</h4>
-            <p>Successful Grants</p>
+            <h4>{approvedGrantsCount}</h4>
+            <p>Successful Approved Grants</p>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon amber"><FaChartPie /></div>
           <div className="stat-info">
-            <h4>99.2 %</h4>
-            <p>Fund Allocation Efficiency</p>
+            <h4>{stats?.totalApplications ? Math.round((approvedGrantsCount / Math.max(1, stats.totalApplications)) * 1000) / 10 : 0} %</h4>
+            <p>Approval Conversion Efficiency</p>
           </div>
         </div>
       </div>
 
-      {/* Distribution visual breakdown */}
-      <div className="glass-card" style={{ padding: '2rem' }}>
-        <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '1.5rem' }}>Scheme Budget Utilization Summary</h3>
+      {/* Dynamic Scheme Utilization Progress Bars */}
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-xl)', padding: '2rem', boxShadow: 'var(--shadow-sm)' }}>
+        <h3 style={{ fontSize: '1.25rem', color: '#0f172a', marginBottom: '1.5rem', fontWeight: 700 }}>Database Scheme Budget Utilization</h3>
         
-        <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.9rem', color: '#e2e8f0' }}>
-              <span>Pradhan Mantri Awas Yojana (Housing)</span>
-              <strong>78% Utilized (₹7.8 Cr / ₹10 Cr)</strong>
-            </div>
-            <div style={{ height: '10px', background: 'rgba(15, 23, 42, 0.8)', borderRadius: '5px', overflow: 'hidden' }}>
-              <div style={{ width: '78%', height: '100%', background: 'var(--gradient-brand)' }}></div>
-            </div>
-          </div>
+        {isLoading ? (
+          <p style={{ color: '#64748b', padding: '2rem', textAlign: 'center' }}>Loading live database utilization statistics...</p>
+        ) : schemesData.length === 0 ? (
+          <p style={{ color: '#64748b', padding: '2rem', textAlign: 'center' }}>No configured schemes found in database.</p>
+        ) : (
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            {schemesData.map(scheme => {
+              const utilPct = scheme.utilizationPercentage || 0;
+              const totalBudg = scheme.totalBudget || 0;
+              const usedBudg = scheme.budgetUsed || 0;
 
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.9rem', color: '#e2e8f0' }}>
-              <span>PM-KISAN Samman Nidhi (Agriculture)</span>
-              <strong>92% Utilized (₹4.6 Cr / ₹5 Cr)</strong>
-            </div>
-            <div style={{ height: '10px', background: 'rgba(15, 23, 42, 0.8)', borderRadius: '5px', overflow: 'hidden' }}>
-              <div style={{ width: '92%', height: '100%', background: 'var(--gradient-emerald)' }}></div>
-            </div>
+              return (
+                <div key={scheme.schemeId}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.9rem', color: '#334155' }}>
+                    <span style={{ fontWeight: 600 }}>{scheme.schemeName}</span>
+                    <div>
+                      {scheme.budgetWarning && (
+                        <span className="badge badge-rejected" style={{ marginRight: '0.5rem', fontSize: '0.7rem' }}>
+                          WARNING (&gt;80%)
+                        </span>
+                      )}
+                      <strong>
+                        {utilPct}% Utilized (₹{usedBudg.toLocaleString()} / ₹{totalBudg.toLocaleString()})
+                      </strong>
+                    </div>
+                  </div>
+                  <div style={{ height: '12px', background: '#f1f5f9', borderRadius: '6px', overflow: 'hidden' }}>
+                    <div 
+                      style={{ 
+                        width: `${Math.min(100, Math.max(0, utilPct))}%`, 
+                        height: '100%', 
+                        background: utilPct >= 80 ? 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' : 'linear-gradient(135deg, #38bdf8 0%, #60a5fa 100%)',
+                        transition: 'width 0.5s ease' 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.9rem', color: '#e2e8f0' }}>
-              <span>National Higher Education Grant</span>
-              <strong>64% Utilized (₹1.9 Cr / ₹3 Cr)</strong>
-            </div>
-            <div style={{ height: '10px', background: 'rgba(15, 23, 42, 0.8)', borderRadius: '5px', overflow: 'hidden' }}>
-              <div style={{ width: '64%', height: '100%', background: 'var(--gradient-amber)' }}></div>
-            </div>
-          </div>
-        </div>
+        )}
 
       </div>
 

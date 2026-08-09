@@ -43,6 +43,24 @@ public class SchemeService {
         return schemeRepository.save(existingScheme);
     }
 
+    public List<Scheme> getActiveSchemes() {
+        return schemeRepository.findByActiveTrue();
+    }
+
+    @Transactional
+    public Scheme activateScheme(@NonNull Long id) {
+        Scheme scheme = getSchemeById(id);
+        scheme.setActive(true);
+        return schemeRepository.save(scheme);
+    }
+
+    @Transactional
+    public Scheme deactivateScheme(@NonNull Long id) {
+        Scheme scheme = getSchemeById(id);
+        scheme.setActive(false);
+        return schemeRepository.save(scheme);
+    }
+
     @Transactional
     public void deleteScheme(Long id) {
         Scheme scheme = getSchemeById(id);
