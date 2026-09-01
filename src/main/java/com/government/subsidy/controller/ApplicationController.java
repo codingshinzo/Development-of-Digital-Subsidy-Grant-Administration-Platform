@@ -2,7 +2,6 @@ package com.government.subsidy.controller;
 
 import com.government.subsidy.dto.WorkflowActionRequest;
 import com.government.subsidy.model.Application;
-import com.government.subsidy.model.ApplicationStatus;
 import com.government.subsidy.model.Role;
 import com.government.subsidy.service.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;

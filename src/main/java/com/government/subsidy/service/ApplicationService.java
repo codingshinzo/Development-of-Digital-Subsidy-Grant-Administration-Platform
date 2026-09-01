@@ -86,13 +86,6 @@ public class ApplicationService {
 
         final String activeEmail = userEmail;
 
-        List<ApplicationStatus> activeStatuses = Arrays.asList(
-                ApplicationStatus.SUBMITTED,
-                ApplicationStatus.FIELD_VERIFIED,
-                ApplicationStatus.DISTRICT_VERIFIED,
-                ApplicationStatus.APPROVED_FOR_PAYMENT,
-                ApplicationStatus.PAYMENT_PENDING
-        );
         if (applicationRepository.existsActiveApplicationForScheme(activeEmail, schemeId, Arrays.asList(ApplicationStatus.FIELD_REJECTED, ApplicationStatus.DISTRICT_REJECTED, ApplicationStatus.REJECTED))) {
             throw new IllegalArgumentException("You already have an active application for " + scheme.getName() + "!");
         }
